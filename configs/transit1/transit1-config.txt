@@ -1,0 +1,320 @@
+!! IOS XR Configuration 5.2.0
+!! Last configuration change at Tue Mar  2 23:55:20 2021 by a
+!
+hostname IPTRANSIT1
+interface MgmtEth0/0/CPU0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/0
+ description Link hacia R2 ether1 [AS65007]
+ ipv4 address 198.18.1.1 255.255.255.252
+ ipv6 address 2002:c:c::1/64
+ ipv6 enable
+!
+interface GigabitEthernet0/0/0/1
+ description Link hacia IXP [AS65000]
+ ipv4 address 192.0.2.1 255.255.255.0
+ ipv6 address 2002:cafe::1/64
+ ipv6 enable
+!
+interface GigabitEthernet0/0/0/2
+ description Link hacia C1 ether1 [AS65001]
+ ipv4 address 198.18.0.5 255.255.255.252
+ ipv6 address 2002:c:c:1::1/64
+ ipv6 enable
+!
+interface GigabitEthernet0/0/0/3
+ description Link hacia C2 ether1 [AS65002]
+ ipv4 address 198.18.0.9 255.255.255.252
+ ipv6 address 2002:c:c:2::1/64
+ ipv6 enable
+!
+interface GigabitEthernet0/0/0/4
+ description Link hacia R2 ether3 [AS65007]
+ ipv4 address 198.18.0.1 255.255.255.252
+ ipv6 address 2002:c:c:3::1/64
+ ipv6 enable
+!
+interface GigabitEthernet0/0/0/5
+ description Internet
+ ipv4 address 172.20.48.101 255.255.255.0
+!
+interface GigabitEthernet0/0/0/6
+ shutdown
+!
+prefix-set IXPs
+  192.0.2.0/24 le 32
+end-set
+!
+prefix-set CUSTOMERS
+  # AS65001
+  198.18.128.0/22 le 24,
+  2002:f001::/32 le 48,
+  # AS65002
+  198.18.132.0/22 le 24,
+  2002:f002::/32 le 48,
+  # AS65007
+  198.18.144.0/22 le 24,
+  2002:f000::/32 le 48
+end-set
+!
+prefix-set LOCALNETS
+  198.18.0.0/18 le 24,
+  2002::/28 le 48
+end-set
+!
+prefix-set CUSTOMERS-NH-BR
+  192.0.2.0/24 le 32,
+  2002:cafe::/32 le 128
+end-set
+!
+prefix-set CUSTOMERS-NH-MX
+  198.18.0.6,
+  2002:c:c:1::2
+end-set
+!
+prefix-set CUSTOMERS-NH-PA
+  198.18.0.10,
+  2002:c:c:2::2
+end-set
+!
+prefix-set CUSTOMERS-NH-UY
+  198.18.1.2,
+  198.18.0.2,
+  2002:c:c::2,
+  2002:c:c:3::2
+end-set
+!
+prefix-set ALLOWED-PREFIXES
+  0.0.0.0/0 le 24,
+  ::/0 le 48
+end-set
+!
+community-set ADD-PREPEND-x1
+  65005:2771
+end-set
+!
+community-set ADD-PREPEND-x2
+  65005:2772
+end-set
+!
+community-set ADVERTISE-TO-IXP
+  65005:5550,
+  65005:5551
+end-set
+!
+community-set SET-LOCALPREF-50
+  65005:1572
+end-set
+!
+community-set SET-LOCALPREF-200
+  65005:1573
+end-set
+!
+route-policy IXP-IN
+  if destination in ALLOWED-PREFIXES then
+    set community (65005:5552)
+    set community (65005:5554) additive
+  endif
+end-policy
+!
+route-policy IXP-OUT
+  if community matches-any (65005:6727) then
+    drop
+  endif
+  if destination in ALLOWED-PREFIXES and community matches-any ADVERTISE-TO-IXP then
+    pass
+  endif
+end-policy
+!
+route-policy CUSTOMERS-IN
+  if not destination in CUSTOMERS then
+    drop
+  else
+    set community (65005:5551) additive
+  endif
+  if next-hop in CUSTOMERS-NH-UY then
+    set community (65005:5553) additive
+  endif
+  if next-hop in CUSTOMERS-NH-BR then
+    set community (65005:5554) additive
+  endif
+  if next-hop in CUSTOMERS-NH-PA then
+    set community (65005:5555) additive
+  endif
+  if next-hop in CUSTOMERS-NH-MX then
+    set community (65005:5556) additive
+  endif
+  if next-hop in IXPs then
+    set community (65005:5552) additive
+  else
+    # Los clientes tienen LOCALPREF default en 150
+    set local-preference 150
+  endif
+  if community matches-any SET-LOCALPREF-50 then
+    set local-preference 50
+  endif
+  if community matches-any SET-LOCALPREF-200 then
+    set local-preference 200
+  endif
+  if community matches-any ADD-PREPEND-x1 then
+    prepend as-path 65005
+  endif
+  if community matches-any ADD-PREPEND-x2 then
+    prepend as-path 65005 2
+  endif
+end-policy
+!
+route-policy CUSTOMERS-OUT
+  if destination in LOCALNETS then
+    set community (65005:5550) additive
+  else
+    if next-hop in CUSTOMERS-NH-UY and community matches-any (65005:6726) then
+      drop
+    endif
+    if next-hop in CUSTOMERS-NH-BR and community matches-any (65005:6727) then
+      drop
+    endif
+    if next-hop in CUSTOMERS-NH-PA and community matches-any (65005:6728) then
+      drop
+    endif
+    if next-hop in CUSTOMERS-NH-MX and community matches-any (65005:6729) then
+      drop
+    endif
+    pass
+  endif
+end-policy
+!
+router static
+ address-family ipv4 unicast
+  0.0.0.0/0 172.20.48.1
+  198.18.0.0/18 Null0 250 tag 666
+ !
+ address-family ipv6 unicast
+  2002::/28 Null0 250 tag 666
+ !
+!
+router bgp 65005
+ bgp router-id 198.18.0.0
+ address-family ipv4 unicast
+  network 198.18.0.0/18
+ !
+ address-family ipv6 unicast
+  network 2002::/28
+ !
+ neighbor-group IXPv4
+  ebgp-multihop 3
+  description IPv4 IXP
+  address-family ipv4 unicast
+   send-community-ebgp
+   route-policy IXP-IN in
+   route-policy IXP-OUT out
+   send-extended-community-ebgp
+  !
+ !
+ neighbor-group IXPv6
+  ebgp-multihop 3
+  description IPv6 IXP
+  address-family ipv6 unicast
+   send-community-ebgp
+   route-policy IXP-IN in
+   route-policy IXP-OUT out
+   send-extended-community-ebgp
+  !
+ !
+ neighbor-group CUSTOMERSv4
+  ebgp-multihop 3
+  description IPv4 CUSTOMERS
+  address-family ipv4 unicast
+   send-community-ebgp
+   route-policy CUSTOMERS-IN in
+   maximum-prefix 512 50 warning-only
+   route-policy CUSTOMERS-OUT out
+   send-extended-community-ebgp
+   default-originate
+  !
+ !
+ neighbor-group CUSTOMERSv6
+  ebgp-multihop 3
+  description IPv6 CUSTOMERS
+  address-family ipv6 unicast
+   send-community-ebgp
+   route-policy CUSTOMERS-IN in
+   maximum-prefix 512 50 warning-only
+   route-policy CUSTOMERS-OUT out
+   send-extended-community-ebgp
+   default-originate
+  !
+ !
+ neighbor 192.0.2.2
+  remote-as 65006
+  use neighbor-group IXPv4
+  description Customer TRANSIT2 AS65006 IPv4
+ !
+ neighbor 192.0.2.3
+  remote-as 65002
+  use neighbor-group IXPv4
+  description Customer C2 AS65002 IPv4
+ !
+ neighbor 192.0.2.4
+  remote-as 65003
+  use neighbor-group IXPv4
+  description Customer C3 AS65003 IPv4
+ !
+ neighbor 198.18.0.2
+  remote-as 65007
+  use neighbor-group CUSTOMERSv4
+  description Customer R2 AS65007 IPv4 Peer2
+ !
+ neighbor 198.18.0.6
+  remote-as 65001
+  use neighbor-group CUSTOMERSv4
+  description Customer C1 AS65001 IPv4
+ !
+ neighbor 198.18.1.2
+  remote-as 65007
+  use neighbor-group CUSTOMERSv4
+  description Customer R2 AS65007 IPv4 Peer1
+ !
+ neighbor 198.18.0.10
+  remote-as 65002
+  use neighbor-group CUSTOMERSv4
+  description Customer C2 AS65002 IPv4
+ !
+ neighbor 2002:c:c::2
+  remote-as 65007
+  use neighbor-group CUSTOMERSv6
+  description Customer R2 AS65007 IPv6 Peer1
+ !
+ neighbor 2002:cafe::2
+  remote-as 65006
+  use neighbor-group IXPv6
+  description Customer TRANSIT2 AS65006 IPv6
+ !
+ neighbor 2002:cafe::3
+  remote-as 65002
+  use neighbor-group IXPv6
+  description Customer C2 AS65002 IPv6
+ !
+ neighbor 2002:cafe::4
+  remote-as 65003
+  use neighbor-group IXPv6
+  description Customer C3 AS65003 IPv6
+ !
+ neighbor 2002:c:c:1::2
+  remote-as 65001
+  use neighbor-group CUSTOMERSv6
+  description Customer C1 AS65001 IPv6
+ !
+ neighbor 2002:c:c:2::2
+  remote-as 65002
+  use neighbor-group CUSTOMERSv6
+  description Customer C2 AS65002 IPv6
+ !
+ neighbor 2002:c:c:3::2
+  remote-as 65007
+  use neighbor-group CUSTOMERSv6
+  description Customer R2 AS65007 IPv6 Peer2
+ !
+!
+end
