@@ -1,0 +1,30 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+
+auto eth0
+# Comentar la siguiente linea para desactivar dhcp  y slaac
+#iface eth0 inet dhcp
+#iface eth0 inet6 auto
+#  privext 2
+
+# Editar las siguientes lineas para poner IPv4 estatica
+iface eth0 inet static
+  address 198.18.145.2
+  netmask 255.255.255.252
+  gateway 198.18.145.1
+  dns-nameservers 8.8.8.8
+
+
+# Editar las siguientes lineas para poner IPv6 estatica
+iface eth0 inet6 static
+  address 2002:F000:A:1::2
+  netmask 64
+  gateway 2002:F000:A:1::1
