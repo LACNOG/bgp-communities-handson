@@ -21,8 +21,9 @@ ip source-route
 !
 ip cef
 no ip domain lookup
+ipv6 unicast-routing
 no ipv6 traffic interface-statistics
-no ipv6 cef
+ipv6 cef
 !
 multilink bundle-name authenticated
 !
@@ -37,8 +38,8 @@ multilink bundle-name authenticated
 redundancy
 ! 
 !
-!
 !         
+!
 !
 !
 !
@@ -61,7 +62,7 @@ interface Ethernet0/2
 !
 interface Ethernet0/3
  no ip address
- shutdown 
+ shutdown
 !
 interface Ethernet1/0
  no ip address
@@ -81,7 +82,14 @@ interface Ethernet1/3
 !
 router bgp 65007
  bgp router-id 10.0.0.2
+ no bgp default ipv4-unicast
  bgp log-neighbor-changes
+ neighbor 2002:C:C::1 remote-as 65005
+ neighbor 2002:C:C::1 description description R2 <--> TRANSIT1 (Link 1)
+ neighbor 2002:C:C:3::1 remote-as 65005
+ neighbor 2002:C:C:3::1 description R2 <--> TRANSIT1 (Link 2)
+ neighbor 2002:F000:E:20::1 remote-as 65007
+ neighbor 2002:F000:E:20::1 description R2 <--> R0
  neighbor 198.18.0.1 remote-as 65005
  neighbor 198.18.0.1 description R2 <--> TRANSIT1 (Link 2)
  neighbor 198.18.0.1 update-source Ethernet0/1
@@ -101,19 +109,28 @@ router bgp 65007
   neighbor 198.18.144.1 soft-reconfiguration inbound
   no auto-summary
  exit-address-family
+ !
+ address-family ipv6
+  neighbor 2002:C:C::1 activate
+  neighbor 2002:C:C::1 soft-reconfiguration inbound
+  neighbor 2002:C:C:3::1 activate
+  neighbor 2002:C:C:3::1 soft-reconfiguration inbound
+  neighbor 2002:F000:E:20::1 activate
+  neighbor 2002:F000:E:20::1 soft-reconfiguration inbound
+ exit-address-family
 !
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
-!         
+!
 !
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 !
 !
-!
+!         
 route-map NADA permit 10
  match ip address prefix-list DENY-ALL
 !
