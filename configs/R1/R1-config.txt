@@ -2,7 +2,7 @@ service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R0
+hostname R1
 !
 boot-start-marker
 boot-end-marker
@@ -21,7 +21,6 @@ mmi snmp-timeout 180
 !
 !
 !
-no ip domain lookup
 ip cef
 no ipv6 cef
 !
@@ -39,8 +38,8 @@ redundancy
 !
 !
 ! 
-!         
 !
+!         
 !
 !
 !
@@ -51,41 +50,57 @@ redundancy
 !
 !
 interface Ethernet0/0
- description RO <--> R2
- ip address 198.18.144.1 255.255.255.252
- ipv6 address 2002:F000:E:20::1/64
+ description R1 <--> TRANSIT2
+ ip address 198.18.64.2 255.255.255.252
+ ipv6 address 2002:1C:C::2/64
 !
 interface Ethernet0/1
- description RO <--> R1
- ip address 198.18.144.9 255.255.255.252
- ipv6 address 2002:F000:E:10::1/64
+ description R1 <--> R0
+ ip address 198.18.144.10 255.255.255.252
+ ipv6 address 2002:F000:E:10::2/64
 !
 interface Ethernet0/2
  no ip address
- shutdown 
-!
+ shutdown
+!         
 interface Ethernet0/3
  no ip address
  shutdown
 !
+interface Ethernet1/0
+ no ip address
+ shutdown
+!
+interface Ethernet1/1
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
+ no ip address
+ shutdown
+!
 router bgp 65007
- bgp router-id 10.0.0.0
+ bgp router-id 10.0.0.1
  bgp log-neighbor-changes
- neighbor 198.18.144.2 remote-as 65007
- neighbor 198.18.144.2 description R0 <--> R2
- neighbor 198.18.144.10 remote-as 65007
- neighbor 198.18.144.10 description R0 <--> R1
+ neighbor 198.18.64.1 remote-as 65006
+ neighbor 198.18.64.1 description R1 <--> TRANSIT2
+ neighbor 198.18.144.9 remote-as 65007
+ neighbor 198.18.144.9 description R1 <--> R0
  !
  address-family ipv4
-  neighbor 198.18.144.2 activate
-  neighbor 198.18.144.2 soft-reconfiguration inbound
-  neighbor 198.18.144.10 activate
-  neighbor 198.18.144.10 soft-reconfiguration inbound
+  neighbor 198.18.64.1 activate
+  neighbor 198.18.64.1 soft-reconfiguration inbound
+  neighbor 198.18.144.9 activate
+  neighbor 198.18.144.9 soft-reconfiguration inbound
  exit-address-family
 !
 ip forward-protocol nd
 !
-!         
+!
 no ip http server
 no ip http secure-server
 !
