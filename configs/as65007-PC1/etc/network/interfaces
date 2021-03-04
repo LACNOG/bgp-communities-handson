@@ -28,3 +28,4 @@ iface eth0 inet6 static
   address 2002:F000:A:1::2
   netmask 64
   gateway 2002:F000:A:1::1
+  
