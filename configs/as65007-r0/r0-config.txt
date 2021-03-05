@@ -23,7 +23,8 @@ mmi snmp-timeout 180
 !
 no ip domain lookup
 ip cef
-no ipv6 cef
+ipv6 unicast-routing
+ipv6 cef
 !
 multilink bundle-name authenticated
 !
@@ -38,8 +39,8 @@ multilink bundle-name authenticated
 redundancy
 !
 !
-! 
 !         
+!
 !
 !
 !
@@ -61,33 +62,73 @@ interface Ethernet0/1
  ipv6 address 2002:F000:E:10::1/64
 !
 interface Ethernet0/2
- no ip address
- shutdown 
+ description R0 <--> PC2
+ ip address 198.18.145.5 255.255.255.252
+ ipv6 address 2002:F000:A:2::1/64
 !
 interface Ethernet0/3
+ description R0 <--> PC1
+ ip address 198.18.145.1 255.255.255.252
+ ipv6 address 2002:F000:A:1::1/64
+!
+interface Ethernet1/0
+ description R0 <--> Rx
+ ip address 198.18.144.21 255.255.255.252
+ ipv6 address 2002:F000:E:40::1/64
+!
+interface Ethernet1/1
+ no ip address
+ shutdown
+!
+interface Ethernet1/2
+ no ip address
+ shutdown
+!
+interface Ethernet1/3
  no ip address
  shutdown
 !
 router bgp 65007
  bgp router-id 10.0.0.0
  bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 2002:F000:E:10::2 remote-as 65007
+ neighbor 2002:F000:E:10::2 description R0 <--> R1
+ neighbor 2002:F000:E:20::2 remote-as 65007
+ neighbor 2002:F000:E:20::2 description R0 <--> R2
+ neighbor 2002:F000:E:40::2 remote-as 65007
+ neighbor 2002:F000:E:40::2 description R0 <--> Rx
  neighbor 198.18.144.2 remote-as 65007
  neighbor 198.18.144.2 description R0 <--> R2
  neighbor 198.18.144.10 remote-as 65007
  neighbor 198.18.144.10 description R0 <--> R1
+ neighbor 198.18.144.22 remote-as 65007
+ neighbor 198.18.144.22 description R0 <--> Rx
  !
  address-family ipv4
   neighbor 198.18.144.2 activate
   neighbor 198.18.144.2 soft-reconfiguration inbound
   neighbor 198.18.144.10 activate
   neighbor 198.18.144.10 soft-reconfiguration inbound
+  neighbor 198.18.144.22 activate
+  neighbor 198.18.144.22 soft-reconfiguration inbound
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2002:F000:E:10::2 activate
+  neighbor 2002:F000:E:10::2 soft-reconfiguration inbound
+  neighbor 2002:F000:E:20::2 activate
+  neighbor 2002:F000:E:20::2 soft-reconfiguration inbound
+  neighbor 2002:F000:E:40::2 activate
+  neighbor 2002:F000:E:40::2 soft-reconfiguration inbound
  exit-address-family
 !
 ip forward-protocol nd
 !
-!         
+!
 no ip http server
 no ip http secure-server
+ip route 10.0.0.0 255.255.0.0 Null0
 !
 !
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
@@ -113,4 +154,4 @@ line vty 0 4
  transport input all
 !
 !
-end
+end       

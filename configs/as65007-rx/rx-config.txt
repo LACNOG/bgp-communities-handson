@@ -2,7 +2,7 @@ service timestamps debug datetime msec
 service timestamps log datetime msec
 no service password-encryption
 !
-hostname R1
+hostname Rx
 !
 boot-start-marker
 boot-end-marker
@@ -51,19 +51,18 @@ redundancy
 !
 !
 interface Ethernet0/0
- description R1 <--> TRANSIT2
- ip address 198.18.64.2 255.255.255.252
- ipv6 address 2002:1C:C::2/64
+ description Rx <--> R0
+ ip address 198.18.144.22 255.255.255.252
+ ipv6 address 2002:F000:E:40::2/64
 !
 interface Ethernet0/1
- description R1 <--> R0
- ip address 198.18.144.10 255.255.255.252
- ipv6 address 2002:F000:E:10::2/64
+ no ip address
+ shutdown
 !
 interface Ethernet0/2
  no ip address
- shutdown 
-!
+ shutdown
+!         
 interface Ethernet0/3
  no ip address
  shutdown
@@ -85,30 +84,21 @@ interface Ethernet1/3
  shutdown
 !
 router bgp 65007
- bgp router-id 10.0.0.1
  bgp log-neighbor-changes
  no bgp default ipv4-unicast
- neighbor 2002:1C:C::1 remote-as 65006
- neighbor 2002:1C:C::1 description R1 <--> TRANSIT2
- neighbor 2002:F000:E:10::1 remote-as 65007
- neighbor 2002:F000:E:10::1 description R1 <--> R0
- neighbor 198.18.64.1 remote-as 65006
- neighbor 198.18.64.1 description R1 <--> TRANSIT2
- neighbor 198.18.144.9 remote-as 65007
- neighbor 198.18.144.9 description R1 <--> R0
+ neighbor 2002:F000:E:40::1 remote-as 65007
+ neighbor 2002:F000:E:40::1 description Rx <--> R0
+ neighbor 198.18.144.21 remote-as 65007
+ neighbor 198.18.144.21 description Rx <--> R0
  !
  address-family ipv4
-  neighbor 198.18.64.1 activate
-  neighbor 198.18.64.1 soft-reconfiguration inbound
-  neighbor 198.18.144.9 activate
-  neighbor 198.18.144.9 soft-reconfiguration inbound
+  neighbor 198.18.144.21 activate
+  neighbor 198.18.144.21 soft-reconfiguration inbound
  exit-address-family
  !
  address-family ipv6
-  neighbor 2002:1C:C::1 activate
-  neighbor 2002:1C:C::1 soft-reconfiguration inbound
-  neighbor 2002:F000:E:10::1 activate
-  neighbor 2002:F000:E:10::1 soft-reconfiguration inbound
+  neighbor 2002:F000:E:40::1 activate
+  neighbor 2002:F000:E:40::1 soft-reconfiguration inbound
  exit-address-family
 !
 ip forward-protocol nd
@@ -118,12 +108,7 @@ no ip http server
 no ip http secure-server
 !
 !
-ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
-!
-route-map NADA permit 10
- match ip address prefix-list DENY-ALL
-!
-!
+!         
 !
 control-plane
 !
@@ -131,7 +116,7 @@ control-plane
 !
 !
 !
-!         
+!
 !
 line con 0
  logging synchronous
