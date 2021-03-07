@@ -1,5 +1,5 @@
 !! IOS XR Configuration 5.2.0
-!! Last configuration change at Wed Mar  3 22:24:02 2021 by a
+!! Last configuration change at Sun Mar  7 22:47:45 2021 by a
 !
 hostname IPTRANSIT1
 interface MgmtEth0/0/CPU0/0
@@ -55,7 +55,9 @@ prefix-set CUSTOMERS
   2002:f002::/32 le 48,
   # AS65007
   198.18.144.0/22 le 24,
-  2002:f000::/32 le 48
+  198.20.0.0/16 le 24,
+  2002:f000::/32 le 48,
+  2002:a000::/32 le 48
 end-set
 !
 prefix-set LOCALNETS
@@ -65,7 +67,9 @@ end-set
 !
 prefix-set BH-C0-AS65007
   198.18.144.0/22 eq 32,
-  2002:f000::/32 eq 128
+  198.20.0.0/16 eq 32,
+  2002:f000::/32 eq 128,
+  2002:a000::/32 eq 128
 end-set
 !
 prefix-set BH-C1-AS65001
@@ -105,6 +109,11 @@ prefix-set ALLOWED-PREFIXES
   ::/0 le 48
 end-set
 !
+prefix-set ALLOWED-RTBH-PREFIXES
+  0.0.0.0/0 eq 32,
+  2000::/3 eq 128
+end-set
+!
 community-set ADD-PREPEND-x1
   65005:2771
 end-set
@@ -126,26 +135,15 @@ community-set SET-LOCALPREF-200
   65005:1573
 end-set
 !
-route-policy RTBH
-  #AS65007 - C0
-  if next-hop in (198.18.2.2, 198.18.1.2, 2002:c:c::2, 2002:c:c:3::2) and (destination in BH-C0-AS65007 and community matches-any (65005:9999)) then
-    set next-hop discard
-  endif
-  #AS65001 - C1
-  if next-hop in (198.18.0.6, 2002:c:c:1::2) and (destination in BH-C1-AS65001 and community matches-any (65005:9999)) then
-    set next-hop discard
-  endif
-  #AS65002 - C2
-  if next-hop in (198.18.0.10, 2002:c:c:2::2) and (destination in BH-C1-AS65001 and community matches-any (65005:9999)) then
-    set next-hop discard
-  endif
-end-policy
-!
 route-policy IXP-IN
   if destination in ALLOWED-PREFIXES then
     set community (65005:5552)
     set community (65005:5554) additive
   endif
+end-policy
+!
+route-policy PERMIT
+  done
 end-policy
 !
 route-policy IXP-OUT
@@ -158,7 +156,28 @@ route-policy IXP-OUT
 end-policy
 !
 route-policy CUSTOMERS-IN
-  apply RTBH
+  # Chequeos de RTBH - Soy permisivo y no dropeo prefijos en caso de que usen mal la community
+  if community matches-any (65005:9999) then
+    #AS65007 - C0
+    if next-hop in (198.18.2.2, 198.18.1.2, 2002:c:c::2, 2002:c:c:3::2) and destination in BH-C0-AS65007 then
+      set next-hop discard
+      done
+    endif
+    #AS65001 - C1
+    if next-hop in (198.18.0.6, 2002:c:c:1::2) and destination in BH-C1-AS65001 then
+      set next-hop discard
+      done
+    endif
+    #AS65002 - C2
+    if next-hop in (198.18.0.10, 2002:c:c:2::2) and destination in BH-C2-AS65002 then
+      set next-hop discard
+      done
+    endif
+  else
+    delete community in (65005:9999)
+    done
+  endif
+  # Fin del RTBH
   if not destination in CUSTOMERS then
     drop
   else
@@ -219,7 +238,6 @@ end-policy
 router static
  address-family ipv4 unicast
   0.0.0.0/0 172.20.48.1
-  192.0.0.0/32 Null0 description Blackhole
   198.18.0.0/18 Null0 250 tag 666
  !
  address-family ipv6 unicast
@@ -264,6 +282,7 @@ router bgp 65005
    route-policy CUSTOMERS-OUT out
    send-extended-community-ebgp
    default-originate
+   soft-reconfiguration inbound always
   !
  !
  neighbor-group CUSTOMERSv6
@@ -276,6 +295,7 @@ router bgp 65005
    route-policy CUSTOMERS-OUT out
    send-extended-community-ebgp
    default-originate
+   soft-reconfiguration inbound always
   !
  !
  neighbor 192.0.2.2
@@ -312,6 +332,8 @@ router bgp 65005
   remote-as 65002
   use neighbor-group CUSTOMERSv4
   description Customer C2 AS65002 IPv4
+  address-family ipv4 unicast
+  !
  !
  neighbor 2002:c:c::2
   remote-as 65007
