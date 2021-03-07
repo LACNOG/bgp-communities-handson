@@ -1,0 +1,144 @@
+set version 18.2R1.9
+set system root-authentication encrypted-password "$6$f9eYTiCc$rhGhuw5.git5GH/JOSLtaBDDXmU2kRafD3yl4zgdOyU8IRDOfqZjLBG9129fo5gam8eZEhQv2PjvQua2IxJ.6/"
+set system syslog user * any emergency
+deactivate system syslog user *
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set system processes dhcp-service traceoptions file dhcp_logfile
+set system processes dhcp-service traceoptions file size 10m
+set system processes dhcp-service traceoptions level all
+set system processes dhcp-service traceoptions flag packet
+set interfaces ge-0/0/0 description UY:R1:AS65007
+set interfaces ge-0/0/0 unit 0 family inet address 198.18.64.1/30
+set interfaces ge-0/0/0 unit 0 family inet6 address 2002:1c:c::1/64
+set interfaces ge-0/0/1 description BR:IXP:AS65000
+set interfaces ge-0/0/1 unit 0 family inet address 192.0.2.2/24
+set interfaces ge-0/0/1 unit 0 family inet6 address 2002:cafe::2/32
+set interfaces ge-0/0/2 description AR:C3:AS65003
+set interfaces ge-0/0/2 unit 0 family inet address 198.18.64.5/30
+set interfaces ge-0/0/2 unit 0 family inet6 address 2002:1c:c:3::1/64
+set interfaces ge-0/0/3 description BO:C4:AS65004
+set interfaces ge-0/0/3 unit 0 family inet address 198.18.64.9/30
+set interfaces ge-0/0/3 unit 0 family inet6 address 2002:1c:c:4::1/64
+set interfaces fxp0 unit 0 family inet dhcp vendor-id Juniper-vmx-VM602D903376
+set routing-options static route 198.18.64.0/18 discard
+set routing-options static route 198.18.64.0/18 community 65006:1
+set routing-options autonomous-system 65006
+set protocols bgp group UY-65007-v4 type external
+set protocols bgp group UY-65007-v4 import CLIENTES_IN
+set protocols bgp group UY-65007-v4 family inet unicast
+set protocols bgp group UY-65007-v4 export CLIENTES_UY_OUT
+set protocols bgp group UY-65007-v4 peer-as 65007
+set protocols bgp group UY-65007-v4 neighbor 198.18.64.2 description UY:R1:AS65007
+set protocols bgp group UY-65007-v6 type external
+set protocols bgp group UY-65007-v6 import CLIENTES_IN
+set protocols bgp group UY-65007-v6 family inet6 unicast
+set protocols bgp group UY-65007-v6 export CLIENTES_UY_OUT
+set protocols bgp group UY-65007-v6 peer-as 65007
+set protocols bgp group UY-65007-v6 neighbor 2002:1c:c::2 description UY:R1:AS65007
+set protocols bgp group BO-65004-v4 type external
+set protocols bgp group BO-65004-v4 import CLIENTES_IN
+set protocols bgp group BO-65004-v4 family inet unicast
+set protocols bgp group BO-65004-v4 export CLIENTES_BO_OUT
+set protocols bgp group BO-65004-v4 peer-as 65004
+set protocols bgp group BO-65004-v4 neighbor 198.18.64.10 description BO:C4:AS65004
+set protocols bgp group BO-65004-v6 type external
+set protocols bgp group BO-65004-v6 import CLIENTES_IN
+set protocols bgp group BO-65004-v6 family inet6 unicast
+set protocols bgp group BO-65004-v6 export CLIENTES_BO_OUT
+set protocols bgp group BO-65004-v6 peer-as 65004
+set protocols bgp group BO-65004-v6 neighbor 2002:1c:c:4::2 description BO:C4:AS65004
+set protocols bgp group AR-65003-v4 type external
+set protocols bgp group AR-65003-v4 import CLIENTES_IN
+set protocols bgp group AR-65003-v4 family inet unicast
+set protocols bgp group AR-65003-v4 export CLIENTES_AR_OUT
+set protocols bgp group AR-65003-v4 peer-as 65003
+set protocols bgp group AR-65003-v4 neighbor 198.18.64.6 description AR:C3:AS65003
+set protocols bgp group AR-65003-v6 type external
+set protocols bgp group AR-65003-v6 import CLIENTES_IN
+set protocols bgp group AR-65003-v6 family inet6 unicast
+set protocols bgp group AR-65003-v6 export CLIENTES_AR_OUT
+set protocols bgp group AR-65003-v6 peer-as 65003
+set protocols bgp group AR-65003-v6 neighbor 2002:1c:c:3::2 description AR:C3:AS65003
+set protocols bgp group BR-IXP-v4 type external
+set protocols bgp group BR-IXP-v4 import IXP_IN
+set protocols bgp group BR-IXP-v4 family inet unicast
+set protocols bgp group BR-IXP-v4 export IXP_OUT
+set protocols bgp group BR-IXP-v4 neighbor 192.0.2.1 description TRANSIT1:AS65005
+set protocols bgp group BR-IXP-v4 neighbor 192.0.2.1 peer-as 65005
+set protocols bgp group BR-IXP-v4 neighbor 192.0.2.3 description PY:C2:AS65002
+set protocols bgp group BR-IXP-v4 neighbor 192.0.2.3 peer-as 65002
+deactivate protocols bgp group BR-IXP-v4 neighbor 192.0.2.3
+set protocols bgp group BR-IXP-v4 neighbor 192.0.2.4 description AR:C3:AS65003
+set protocols bgp group BR-IXP-v4 neighbor 192.0.2.4 peer-as 65003
+deactivate protocols bgp group BR-IXP-v4 neighbor 192.0.2.4
+set protocols bgp group BR-IXP-v6 type external
+set protocols bgp group BR-IXP-v6 family inet6 unicast
+set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::1 description TRANSIT1:AS65005
+set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::1 peer-as 65005
+set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::3 description PY:C2:AS65002
+set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::3 peer-as 65002
+deactivate protocols bgp group BR-IXP-v6 neighbor 2002:cafe::3
+set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::4 description PY:C2:AS65003
+set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::4 peer-as 65003
+deactivate protocols bgp group BR-IXP-v6 neighbor 2002:cafe::4
+set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR from community NO_PROPAGAR
+set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR from community NO_PROPAGAR_CLIENTES
+set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR from community NO_PROPAGAR_ARGENTINA
+set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement CLIENTES_AR_OUT term LOCALES from community PROPIOS
+set policy-options policy-statement CLIENTES_AR_OUT term LOCALES then accept
+set policy-options policy-statement CLIENTES_AR_OUT term FINAL from protocol bgp
+set policy-options policy-statement CLIENTES_AR_OUT term FINAL then accept
+set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR from community NO_PROPAGAR
+set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR from community NO_PROPAGAR_CLIENTES
+set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR from community NO_PROPAGAR_BOLIVIA
+set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement CLIENTES_BO_OUT term LOCALES from community PROPIOS
+set policy-options policy-statement CLIENTES_BO_OUT term LOCALES then accept
+set policy-options policy-statement CLIENTES_BO_OUT term FINAL from protocol bgp
+set policy-options policy-statement CLIENTES_BO_OUT term FINAL then accept
+set policy-options policy-statement CLIENTES_IN term BLACKHOLE from community BLACKHOLE
+set policy-options policy-statement CLIENTES_IN term BLACKHOLE then next-hop 200.31.0.1
+set policy-options policy-statement CLIENTES_IN term LOCAL_PREF_MENOR from community LOCAL_PREF_MENOR
+set policy-options policy-statement CLIENTES_IN term LOCAL_PREF_MENOR then local-preference 90
+set policy-options policy-statement CLIENTES_IN term LOCAL_PREF_MAYOR from community LOCAL_PREF_MAYOR
+set policy-options policy-statement CLIENTES_IN term LOCAL_PREF_MAYOR then local-preference 110
+set policy-options policy-statement CLIENTES_IN term PREPENDX1 from community PREPENDX1
+set policy-options policy-statement CLIENTES_IN term PREPENDX1 then as-path-prepend 65006
+set policy-options policy-statement CLIENTES_IN term PREPENDX2 from community PREPENDX2
+set policy-options policy-statement CLIENTES_IN term PREPENDX2 then as-path-prepend "65006 65006"
+set policy-options policy-statement CLIENTES_IN term FINAL then community add CLIENTES
+set policy-options policy-statement CLIENTES_IN term FINAL then accept
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR_CLIENTES
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR_URUGUAY
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement CLIENTES_UY_OUT term LOCALES from community PROPIOS
+set policy-options policy-statement CLIENTES_UY_OUT term LOCALES then accept
+set policy-options policy-statement CLIENTES_UY_OUT term FINAL from protocol bgp
+set policy-options policy-statement CLIENTES_UY_OUT term FINAL then accept
+set policy-options policy-statement IXP_IN term FINAL then community set PEERS
+set policy-options policy-statement IXP_IN term FINAL then accept
+set policy-options policy-statement IXP_OUT term NO_PROPAGAR from community NO_PROPAGAR
+set policy-options policy-statement IXP_OUT term NO_PROPAGAR from community NO_PROPAGAR_PEERS
+set policy-options policy-statement IXP_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement IXP_OUT term MIS_PREFIJOS from community PROPIOS
+set policy-options policy-statement IXP_OUT term MIS_PREFIJOS from community CLIENTES
+set policy-options policy-statement IXP_OUT term MIS_PREFIJOS then accept
+set policy-options policy-statement IXP_OUT term FINAL then reject
+set policy-options community BLACKHOLE members 65006:666
+set policy-options community CLIENTES members 65006:2
+set policy-options community LOCAL_PREF_MAYOR members 65006:110
+set policy-options community LOCAL_PREF_MENOR members 65006:90
+set policy-options community NO_PROPAGAR members 65006:1000
+set policy-options community NO_PROPAGAR_ARGENTINA members 65006:1032
+set policy-options community NO_PROPAGAR_BOLIVIA members 65006:1068
+set policy-options community NO_PROPAGAR_CLIENTES members 65006:1002
+set policy-options community NO_PROPAGAR_PEERS members 65006:1003
+set policy-options community NO_PROPAGAR_URUGUAY members 65006:1858
+set policy-options community PEERS members 65006:3
+set policy-options community PREPENDX1 members 65006:2001
+set policy-options community PREPENDX2 members 65006:2002
+set policy-options community PROPIOS members 65006:1
