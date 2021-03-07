@@ -1,5 +1,5 @@
 !! IOS XR Configuration 5.2.0
-!! Last configuration change at Sun Mar  7 22:47:45 2021 by a
+!! Last configuration change at Sun Mar  7 23:34:54 2021 by a
 !
 hostname IPTRANSIT1
 interface MgmtEth0/0/CPU0/0
@@ -231,7 +231,9 @@ route-policy CUSTOMERS-OUT
     if next-hop in CUSTOMERS-NH-MX and community matches-any (65005:6729) then
       drop
     endif
-    pass
+    if destination in ALLOWED-PREFIXES then
+      done
+    endif
   endif
 end-policy
 !
