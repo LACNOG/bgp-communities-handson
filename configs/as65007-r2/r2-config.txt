@@ -45,6 +45,9 @@ redundancy
 !
 !
 !
+interface Loopback0
+ ip address 198.18.147.3 255.255.255.0
+!
 interface Ethernet0/0
  description R2 <--> TRANSIT1 (Link 1)
  ip address 198.18.1.2 255.255.255.252
@@ -58,6 +61,7 @@ interface Ethernet0/1
 interface Ethernet0/2
  description R2 <--> R0
  ip address 198.18.144.2 255.255.255.252
+ ip router isis 65007
  ipv6 address 2002:F000:E:20::2/64
 !
 interface Ethernet0/3
@@ -80,8 +84,14 @@ interface Ethernet1/3
  no ip address
  shutdown
 !
+router isis 65007
+ net 49.0198.0018.0147.0003.00
+ passive-interface Ethernet0/0
+ passive-interface Ethernet0/1
+ passive-interface Loopback0
+!
 router bgp 65007
- bgp router-id 10.0.0.2
+ bgp router-id 198.18.147.3
  no bgp default ipv4-unicast
  bgp log-neighbor-changes
  neighbor 2002:C:C::1 remote-as 65005
@@ -120,17 +130,18 @@ router bgp 65007
  exit-address-family
 !
 ip forward-protocol nd
-!
+!         
 !
 no ip http server
 no ip http secure-server
+ip route 10.0.0.1 255.255.255.255 Null0
 !
 !
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 !
 !
-!         
+!
 route-map NADA permit 10
  match ip address prefix-list DENY-ALL
 !
