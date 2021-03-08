@@ -16,8 +16,8 @@ no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
 !
-!         
 !
+!         
 !
 !
 !
@@ -39,6 +39,7 @@ multilink bundle-name authenticated
 redundancy
 !
 !
+! 
 !         
 !
 !
@@ -50,15 +51,15 @@ redundancy
 !
 !
 !
-!
 interface Loopback0
- ip address 198.18.147.222 255.255.255.0
+ ip address 198.18.147.222 255.255.255.255
 !
 interface Ethernet0/0
  description Rx <--> R0
  ip address 198.18.144.22 255.255.255.252
  ip router isis 65007
  ipv6 address 2002:F000:E:40::2/64
+ ipv6 router isis 65007
 !
 interface Ethernet0/1
  no ip address
@@ -89,7 +90,7 @@ interface Ethernet1/3
  shutdown
 !
 router isis 65007
- net 49.0198.0018.0147.0222.00
+ net 49.0001.1980.1814.7222.00
  passive-interface Loopback0
 !
 router bgp 65007
@@ -104,34 +105,45 @@ router bgp 65007
  address-family ipv4
   network 198.18.144.0 mask 255.255.252.0 route-map B198-18-144-0--22
   network 198.20.0.0 mask 255.255.0.0 route-map B198-20-0-0--16
+  network 198.20.10.0 route-map B198-20-10-0--24
   neighbor 198.18.144.21 activate
+  neighbor 198.18.144.21 send-community both
   neighbor 198.18.144.21 soft-reconfiguration inbound
  exit-address-family
  !
  address-family ipv6
   neighbor 2002:F000:E:40::1 activate
+  neighbor 2002:F000:E:40::1 send-community both
   neighbor 2002:F000:E:40::1 soft-reconfiguration inbound
  exit-address-family
 !
 ip forward-protocol nd
 !
+ip bgp-community new-format
 !
 no ip http server
 no ip http secure-server
 ip route 198.18.144.0 255.255.252.0 Null0
 ip route 198.20.0.0 255.255.0.0 Null0
+ip route 198.20.10.0 255.255.255.0 Null0
 !
 !
 route-map B198-18-144-0--22 permit 10
  set local-preference 100
  set origin igp
  set ip next-hop 10.0.0.1
-!
+!         
 route-map B198-20-0-0--16 permit 10
  set local-preference 100
  set origin igp
  set ip next-hop 10.0.0.1
-!         
+!
+route-map B198-20-10-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10000
+ set ip next-hop 10.0.0.1
+!
 !
 !
 control-plane
@@ -143,6 +155,7 @@ control-plane
 !
 !
 line con 0
+ exec-timeout 60 0
  logging synchronous
 line aux 0
 line vty 0 4

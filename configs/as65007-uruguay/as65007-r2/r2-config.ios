@@ -46,7 +46,7 @@ redundancy
 !
 !
 interface Loopback0
- ip address 198.18.147.3 255.255.255.0
+ ip address 198.18.147.3 255.255.255.255
 !
 interface Ethernet0/0
  description R2 <--> TRANSIT1 (Link 1)
@@ -63,6 +63,7 @@ interface Ethernet0/2
  ip address 198.18.144.2 255.255.255.252
  ip router isis 65007
  ipv6 address 2002:F000:E:20::2/64
+ ipv6 router isis 65007
 !
 interface Ethernet0/3
  no ip address
@@ -83,9 +84,9 @@ interface Ethernet1/2
 interface Ethernet1/3
  no ip address
  shutdown
-!
+!         
 router isis 65007
- net 49.0198.0018.0147.0003.00
+ net 49.0003.1980.1814.7003.00
  passive-interface Ethernet0/0
  passive-interface Ethernet0/1
  passive-interface Loopback0
@@ -130,7 +131,8 @@ router bgp 65007
  exit-address-family
 !
 ip forward-protocol nd
-!         
+!
+ip bgp-community new-format
 !
 no ip http server
 no ip http secure-server

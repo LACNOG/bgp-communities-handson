@@ -52,19 +52,21 @@ redundancy
 !
 !
 interface Loopback0
- ip address 198.18.147.1 255.255.255.0
+ ip address 198.18.147.1 255.255.255.255
 !
 interface Ethernet0/0
  description RO <--> R2
  ip address 198.18.144.1 255.255.255.252
  ip router isis 65007
  ipv6 address 2002:F000:E:20::1/64
+ ipv6 router isis 65007
 !
 interface Ethernet0/1
  description RO <--> R1
  ip address 198.18.144.9 255.255.255.252
  ip router isis 65007
  ipv6 address 2002:F000:E:10::1/64
+ ipv6 router isis 65007
 !
 interface Ethernet0/2
  description R0 <--> PC2
@@ -81,11 +83,13 @@ interface Ethernet1/0
  ip address 198.18.144.21 255.255.255.252
  ip router isis 65007
  ipv6 address 2002:F000:E:40::1/64
+ ipv6 router isis 65007
 !
 interface Ethernet1/1
- no ip address
- shutdown
-!         
+ description R0 <--> LAN1 (PC3 y PC4)
+ ip address 198.20.100.1 255.255.255.0
+ ipv6 address 2002:A000:0:100::1/64
+!
 interface Ethernet1/2
  no ip address
  shutdown
@@ -95,9 +99,10 @@ interface Ethernet1/3
  shutdown
 !
 router isis 65007
- net 49.0198.0018.0147.0001.00
+ net 49.0001.1980.1814.7001.00
  passive-interface Ethernet0/2
  passive-interface Ethernet0/3
+ passive-interface Ethernet1/1
  passive-interface Loopback0
 !
 router bgp 65007
@@ -122,6 +127,7 @@ router bgp 65007
   neighbor 198.18.144.2 route-reflector-client
   neighbor 198.18.144.2 soft-reconfiguration inbound
   neighbor 198.18.144.10 activate
+  neighbor 198.18.144.10 send-community both
   neighbor 198.18.144.10 route-reflector-client
   neighbor 198.18.144.10 soft-reconfiguration inbound
   neighbor 198.18.144.22 activate
@@ -143,18 +149,19 @@ router bgp 65007
 !
 ip forward-protocol nd
 !
+ip bgp-community new-format
 !
 no ip http server
 no ip http secure-server
 !
-!
+!         
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 route-map NADA permit 10
  match ip address prefix-list DENY-ALL
 !
 !
-!         
+!
 control-plane
 !
 !
@@ -164,11 +171,12 @@ control-plane
 !
 !
 line con 0
+ exec-timeout 60 0
  logging synchronous
 line aux 0
 line vty 0 4
  login
  transport input all
-!
+!         
 !
 end
