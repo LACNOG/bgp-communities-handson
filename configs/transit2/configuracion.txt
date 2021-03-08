@@ -1,5 +1,5 @@
 set version 18.2R1.9
-set system root-authentication encrypted-password "$6$f9eYTiCc$rhGhuw5.git5GH/JOSLtaBDDXmU2kRafD3yl4zgdOyU8IRDOfqZjLBG9129fo5gam8eZEhQv2PjvQua2IxJ.6/"
+set system root-authentication encrypted-password hidden
 set system syslog user * any emergency
 deactivate system syslog user *
 set system syslog file messages any notice
@@ -97,6 +97,12 @@ set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR from commun
 set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR from community NO_PROPAGAR_ARGENTINA
 set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR from community BLACKHOLE
 set policy-options policy-statement CLIENTES_AR_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement CLIENTES_AR_OUT term PREPENDX1 from community PREPENDX1_CLIENTES
+set policy-options policy-statement CLIENTES_AR_OUT term PREPENDX1 from community PREPENDX1_AR
+set policy-options policy-statement CLIENTES_AR_OUT term PREPENDX1 then as-path-prepend 65006
+set policy-options policy-statement CLIENTES_AR_OUT term PREPENDX2 from community PREPENDX2_CLIENTES
+set policy-options policy-statement CLIENTES_AR_OUT term PREPENDX2 from community PREPENDX2_AR
+set policy-options policy-statement CLIENTES_AR_OUT term PREPENDX2 then as-path-prepend "65006 65006"
 set policy-options policy-statement CLIENTES_AR_OUT term LOCALES from community PROPIOS
 set policy-options policy-statement CLIENTES_AR_OUT term LOCALES then accept
 set policy-options policy-statement CLIENTES_AR_OUT term FINAL from protocol bgp
@@ -106,6 +112,12 @@ set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR from commun
 set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR from community NO_PROPAGAR_BOLIVIA
 set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR from community BLACKHOLE
 set policy-options policy-statement CLIENTES_BO_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement CLIENTES_BO_OUT term PREPENDX1 from community PREPENDX1_CLIENTES
+set policy-options policy-statement CLIENTES_BO_OUT term PREPENDX1 from community PREPENDX1_BO
+set policy-options policy-statement CLIENTES_BO_OUT term PREPENDX1 then as-path-prepend 65006
+set policy-options policy-statement CLIENTES_BO_OUT term PREPENDX2 from community PREPENDX2_CLIENTES
+set policy-options policy-statement CLIENTES_BO_OUT term PREPENDX2 from community PREPENDX2_BO
+set policy-options policy-statement CLIENTES_BO_OUT term PREPENDX2 then as-path-prepend "65006 65006"
 set policy-options policy-statement CLIENTES_BO_OUT term LOCALES from community PROPIOS
 set policy-options policy-statement CLIENTES_BO_OUT term LOCALES then accept
 set policy-options policy-statement CLIENTES_BO_OUT term FINAL from protocol bgp
@@ -131,6 +143,12 @@ set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from commun
 set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR_URUGUAY
 set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community BLACKHOLE
 set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement CLIENTES_UY_OUT term PREPENDX1 from community PREPENDX1_CLIENTES
+set policy-options policy-statement CLIENTES_UY_OUT term PREPENDX1 from community PREPENDX1_UY
+set policy-options policy-statement CLIENTES_UY_OUT term PREPENDX1 then as-path-prepend 65006
+set policy-options policy-statement CLIENTES_UY_OUT term PREPENDX2 from community PREPENDX2_CLIENTES
+set policy-options policy-statement CLIENTES_UY_OUT term PREPENDX2 from community PREPENDX2_UY
+set policy-options policy-statement CLIENTES_UY_OUT term PREPENDX2 then as-path-prepend "65006 65006"
 set policy-options policy-statement CLIENTES_UY_OUT term LOCALES from community PROPIOS
 set policy-options policy-statement CLIENTES_UY_OUT term LOCALES then accept
 set policy-options policy-statement CLIENTES_UY_OUT term FINAL from protocol bgp
@@ -141,21 +159,36 @@ set policy-options policy-statement IXP_OUT term NO_PROPAGAR from community NO_P
 set policy-options policy-statement IXP_OUT term NO_PROPAGAR from community NO_PROPAGAR_PEERS
 set policy-options policy-statement IXP_OUT term NO_PROPAGAR from community BLACKHOLE
 set policy-options policy-statement IXP_OUT term NO_PROPAGAR then reject
-set policy-options policy-statement IXP_OUT term MIS_PREFIJOS from community PROPIOS
-set policy-options policy-statement IXP_OUT term MIS_PREFIJOS from community CLIENTES
-set policy-options policy-statement IXP_OUT term MIS_PREFIJOS then accept
+set policy-options policy-statement IXP_OUT term PREPENDX1 from community PREPENDX1_PEERS
+set policy-options policy-statement IXP_OUT term PREPENDX1 then as-path-prepend 65006
+set policy-options policy-statement IXP_OUT term PREPENDX2 from community PREPENDX2_PEERS
+set policy-options policy-statement IXP_OUT term PREPENDX2 then as-path-prepend "65006 65006"
+set policy-options policy-statement IXP_OUT term LOCALES from community PROPIOS
+set policy-options policy-statement IXP_OUT term LOCALES from community CLIENTES
+set policy-options policy-statement IXP_OUT term LOCALES then accept
 set policy-options policy-statement IXP_OUT term FINAL then reject
+set policy-options community BLACKHOLE members 65006:999
 set policy-options community BLACKHOLE members 65006:666
 set policy-options community CLIENTES members 65006:2
 set policy-options community LOCAL_PREF_MAYOR members 65006:110
 set policy-options community LOCAL_PREF_MENOR members 65006:90
-set policy-options community NO_PROPAGAR members 65006:1000
-set policy-options community NO_PROPAGAR_ARGENTINA members 65006:1032
-set policy-options community NO_PROPAGAR_BOLIVIA members 65006:1068
-set policy-options community NO_PROPAGAR_CLIENTES members 65006:1002
-set policy-options community NO_PROPAGAR_PEERS members 65006:1003
-set policy-options community NO_PROPAGAR_URUGUAY members 65006:1858
+set policy-options community NO_PROPAGAR members 65006:600
+set policy-options community NO_PROPAGAR_ARGENTINA members 65006:6032
+set policy-options community NO_PROPAGAR_BOLIVIA members 65006:6068
+set policy-options community NO_PROPAGAR_CLIENTES members 65006:602
+set policy-options community NO_PROPAGAR_PEERS members 65006:603
+set policy-options community NO_PROPAGAR_URUGUAY members 65006:6858
 set policy-options community PEERS members 65006:3
-set policy-options community PREPENDX1 members 65006:2001
-set policy-options community PREPENDX2 members 65006:2002
+set policy-options community PREPENDX1 members 65006:501
+set policy-options community PREPENDX1_AR members large:65006:501:65003
+set policy-options community PREPENDX1_BO members large:65006:501:65004
+set policy-options community PREPENDX1_CLIENTES members 65006:521
+set policy-options community PREPENDX1_PEERS members 65006:531
+set policy-options community PREPENDX1_UY members large:65006:501:65007
+set policy-options community PREPENDX2 members 65006:502
+set policy-options community PREPENDX2_AR members large:65006:502:65003
+set policy-options community PREPENDX2_BO members large:65006:502:65004
+set policy-options community PREPENDX2_CLIENTES members 65006:522
+set policy-options community PREPENDX2_PEERS members 65006:532
+set policy-options community PREPENDX2_UY members large:65006:502:65007
 set policy-options community PROPIOS members 65006:1
