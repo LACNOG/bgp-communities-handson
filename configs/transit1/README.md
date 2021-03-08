@@ -2,14 +2,25 @@
 
 ![TRANSIT1](/assets/img/lacnog-handson-bgp-as65005.png)
 
-IPTRANSIT1 es un proveedor de servicios que interconecta clientes en varias regiones.
+*TRANSIT1* es un proveedor de servicios que interconecta clientes en varias regiones.
 
-Aprende y publica prefijos IP propios desde el AS65005, también brinda servicios de tránsito IPv4/IPv6 entre sus clientes (AS65007, AS65001 y AS65002).
+Aprende y publica prefijos IP propios desde el AS65005, también brinda servicios de tránsito IPv4/IPv6 entre sus clientes (AS65007, AS65001 y AS65002).  
+
+*TRANSIT1* se interconecta al IXP en donde mantiene peerings BGP contra el route-server y contra su querido vecino *TRANSIT2*
 
 ## Tablas de comunidades
 
 ![Tablas de comunidades del AS65005](/assets/img/lacnog-handson-bgp-communities-as65005.png)
 
+
+## Direcciones de Loopback para pruebas
+
+* 198.18.6.66
+* 2002:a:a:a:a:a:a:a
+
+## Política de Peering
+
+En *TRANSIT1* la política de peering es selectiva. No confiamos en sistemas autónomos intergalácticos. **No insista**
 
 ## Información extra
 

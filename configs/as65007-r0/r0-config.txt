@@ -51,14 +51,19 @@ redundancy
 !
 !
 !
+interface Loopback0
+ ip address 198.18.147.1 255.255.255.0
+!
 interface Ethernet0/0
  description RO <--> R2
  ip address 198.18.144.1 255.255.255.252
+ ip router isis 65007
  ipv6 address 2002:F000:E:20::1/64
 !
 interface Ethernet0/1
  description RO <--> R1
  ip address 198.18.144.9 255.255.255.252
+ ip router isis 65007
  ipv6 address 2002:F000:E:10::1/64
 !
 interface Ethernet0/2
@@ -74,12 +79,13 @@ interface Ethernet0/3
 interface Ethernet1/0
  description R0 <--> Rx
  ip address 198.18.144.21 255.255.255.252
+ ip router isis 65007
  ipv6 address 2002:F000:E:40::1/64
 !
 interface Ethernet1/1
  no ip address
  shutdown
-!
+!         
 interface Ethernet1/2
  no ip address
  shutdown
@@ -88,8 +94,14 @@ interface Ethernet1/3
  no ip address
  shutdown
 !
+router isis 65007
+ net 49.0198.0018.0147.0001.00
+ passive-interface Ethernet0/2
+ passive-interface Ethernet0/3
+ passive-interface Loopback0
+!
 router bgp 65007
- bgp router-id 10.0.0.0
+ bgp router-id 198.18.147.1
  bgp log-neighbor-changes
  no bgp default ipv4-unicast
  neighbor 2002:F000:E:10::2 remote-as 65007
@@ -107,19 +119,25 @@ router bgp 65007
  !
  address-family ipv4
   neighbor 198.18.144.2 activate
+  neighbor 198.18.144.2 route-reflector-client
   neighbor 198.18.144.2 soft-reconfiguration inbound
   neighbor 198.18.144.10 activate
+  neighbor 198.18.144.10 route-reflector-client
   neighbor 198.18.144.10 soft-reconfiguration inbound
   neighbor 198.18.144.22 activate
+  neighbor 198.18.144.22 route-reflector-client
   neighbor 198.18.144.22 soft-reconfiguration inbound
  exit-address-family
  !
  address-family ipv6
   neighbor 2002:F000:E:10::2 activate
+  neighbor 2002:F000:E:10::2 route-reflector-client
   neighbor 2002:F000:E:10::2 soft-reconfiguration inbound
   neighbor 2002:F000:E:20::2 activate
+  neighbor 2002:F000:E:20::2 route-reflector-client
   neighbor 2002:F000:E:20::2 soft-reconfiguration inbound
   neighbor 2002:F000:E:40::2 activate
+  neighbor 2002:F000:E:40::2 route-reflector-client
   neighbor 2002:F000:E:40::2 soft-reconfiguration inbound
  exit-address-family
 !
@@ -128,7 +146,6 @@ ip forward-protocol nd
 !
 no ip http server
 no ip http secure-server
-ip route 10.0.0.0 255.255.0.0 Null0
 !
 !
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
@@ -137,7 +154,7 @@ route-map NADA permit 10
  match ip address prefix-list DENY-ALL
 !
 !
-!
+!         
 control-plane
 !
 !
@@ -154,4 +171,4 @@ line vty 0 4
  transport input all
 !
 !
-end       
+end
