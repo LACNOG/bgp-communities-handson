@@ -1,5 +1,5 @@
 !! IOS XR Configuration 5.2.0
-!! Last configuration change at Mon Mar  8 04:12:12 2021 by a
+!! Last configuration change at Mon Mar  8 15:52:46 2021 by a
 !
 hostname IPTRANSIT1
 domain name-server 172.20.64.64
@@ -121,6 +121,13 @@ prefix-set ALLOWED-RTBH-PREFIXES
   2000::/3 eq 128
 end-set
 !
+community-set BLACKHOLE
+  #Legacy
+  65005:9999,
+  #RFC7999
+  65005:666
+end-set
+!
 community-set ADD-PREPEND-x1
   65005:2771
 end-set
@@ -169,7 +176,7 @@ end-policy
 !
 route-policy CUSTOMERS-IN
   # Chequeos de RTBH - Soy permisivo y no dropeo prefijos en caso de que usen mal la community
-  if community matches-any (65005:9999) then
+  if community matches-any BLACKHOLE then
     #AS65007 - C0
     if next-hop in (198.18.2.2, 198.18.1.2, 2002:c:c::2, 2002:c:c:3::2) and destination in BH-C0-AS65007 then
       set next-hop discard
@@ -186,7 +193,7 @@ route-policy CUSTOMERS-IN
       done
     endif
   else
-    delete community in (65005:9999)
+    delete community in BLACKHOLE
     done
   endif
   # Fin del RTBH
