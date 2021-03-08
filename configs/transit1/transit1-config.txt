@@ -1,12 +1,44 @@
 !! IOS XR Configuration 5.2.0
-!! Last configuration change at Mon Mar  8 15:52:46 2021 by a
+!! Last configuration change at Mon Mar  8 19:21:25 2021 by a
 !
 hostname IPTRANSIT1
+banner motd #
+ _____ ____      _    _   _ ____ ___ _____ _ 
+|_   _|  _ \    / \  | \ | / ___|_ _|_   _/ |
+  | | | |_) |  / _ \ |  \| \___ \| |  | | | |
+  | | |  _ <  / ___ \| |\  |___) | |  | | | |
+  |_| |_| \_\/_/   \_\_| \_|____/___| |_| |_|
+
+  NO NEGOCIAMOS CON SISTEMAS INTERGALACTICOS
+#
+telnet vrf default ipv4 server max-servers 1 access-list DENY
+telnet vrf default ipv6 server max-servers 1 access-list DENY
 domain name-server 172.20.64.64
+taskgroup looking-glass
+ task read bgp
+ task read basic-services
+ task write basic-services
+ task execute basic-services
+ description "Looking Glass"
+!
+usergroup looking-glass
+ taskgroup looking-glass
+ description "Looking Glass users"
+!
+username lg
+ group looking-glass
+ secret 5 $1$jlGG$E24YvgTXp8r9EtpSDRG6/.
+!
+ipv6 access-list DENY
+ 10 deny ipv6 any any
+!
+ipv4 access-list DENY
+ 10 deny ipv4 any any
+!
 interface Loopback0
  description Para hacer pruebas
  ipv4 address 198.18.6.66 255.255.255.255
- ipv6 address 2002:a:a:a:a:a:a:a/128
+ ipv6 address 2002::2002/128
  ipv6 enable
 !
 interface MgmtEth0/0/CPU0/0
@@ -382,4 +414,5 @@ router bgp 65005
   description IXP-RS AS65000 IPv6
  !
 !
+ssh server vrf default ipv4 access-list DENY ipv6 access-list DENY
 end

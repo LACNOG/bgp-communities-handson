@@ -6,7 +6,7 @@
 
 Aprende y publica prefijos IP propios desde el AS65005, también brinda servicios de tránsito IPv4/IPv6 entre sus clientes (AS65007, AS65001 y AS65002).  
 
-*TRANSIT1* se interconecta al IXP en donde mantiene peerings BGP contra el route-server y contra su querido vecino *TRANSIT2*
+*TRANSIT1* se interconecta al IXP en donde mantiene peerings BGP contra el route-server y con su querido vecino *TRANSIT2*
 
 ## Tablas de comunidades
 
@@ -16,7 +16,7 @@ Aprende y publica prefijos IP propios desde el AS65005, también brinda servicio
 ## Direcciones de Loopback para pruebas
 
 * 198.18.6.66
-* 2002:a:a:a:a:a:a:a
+* 2002::2002
 
 ## Política de Peering
 

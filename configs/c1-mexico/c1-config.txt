@@ -1,0 +1,34 @@
+# mar/08/2021 19:53:06 by RouterOS 6.48.1
+# software id = 
+#
+#
+#
+/interface bridge add name=Lo0
+/interface ethernet set [ find default-name=ether1 ] comment="Link hacia IPTRANSIT1 Gi0/0/0/2 [AS65005]"
+/interface ethernet set [ find default-name=ether2 ] comment="Link hacia PC"
+/routing bgp instance set default as=65001
+/ip address add address=198.18.0.6/30 interface=ether1 network=198.18.0.4
+/ip address add address=198.18.128.1/30 interface=ether2 network=198.18.128.0
+/ip address add address=198.18.128.128 interface=Lo0 network=198.18.128.128
+/ip dns set servers=1.1.1.1,8.8.8.8
+/ip route add check-gateway=arp distance=21 gateway=198.18.0.5
+/ip route add distance=250 dst-address=198.18.128.0/22 type=blackhole
+/ipv6 address add address=2002:c:c:1::2 advertise=no interface=ether1
+/ipv6 address add address=2002:f001::1 interface=ether2
+/ipv6 address add address=2002:f001::cafe interface=Lo0
+/ipv6 route add distance=21 gateway=2002:c:c:1::1
+/ipv6 route add distance=250 dst-address=2002:f001::/32 type=unreachable
+/routing filter add action=accept chain=BH prefix=198.18.128.128 set-bgp-communities=65005:9999
+/routing filter add action=accept chain=TRANSIT1-IN prefix=0.0.0.0/0 prefix-length=0-24
+/routing filter add action=accept chain=TRANSIT1-IN prefix=2000::/3 prefix-length=3-48
+/routing filter add action=discard chain=TRANSIT1-IN
+/routing filter add action=accept chain=TRANSIT1-OUT prefix=198.18.128.0/22 prefix-length=22-24
+/routing filter add action=accept chain=TRANSIT1-OUT prefix=2002:f001::/32 prefix-length=32-48
+/routing filter add action=accept chain=TRANSIT1-OUT prefix=198.18.128.0/22 prefix-length=32 append-bgp-communities=65005:666
+/routing filter add action=accept chain=TRANSIT1-OUT prefix=2002:f001::/32 prefix-length=128 append-bgp-communities=65005:666
+/routing filter add action=discard chain=TRANSIT1-OUT
+/routing bgp network add network=198.18.128.0/22
+/routing bgp network add network=2002:f001::/32
+/routing bgp peer add in-filter=TRANSIT1-IN name=TRANSIT1v4 out-filter=TRANSIT1-OUT remote-address=198.18.0.5 remote-as=65005
+/routing bgp peer add address-families=ipv6 in-filter=TRANSIT1-IN name=TRANSIT1v6 out-filter=TRANSIT1-OUT remote-address=2002:c:c:1::1 remote-as=65005
+/system identity set name=C1-AS65001

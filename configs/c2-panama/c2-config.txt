@@ -1,34 +1,43 @@
-# mar/02/2021 23:43:40 by RouterOS 6.48.1
+# mar/08/2021 19:51:34 by RouterOS 6.48.1
 # software id = 
 #
 #
 #
-/interface ethernet
-set [ find default-name=ether1 ] comment="Link hacia IPTRANSIT1 Gi0/0/0/3 [AS65005]"
-set [ find default-name=ether2 ] comment="Link hacia IXP [AS65000]"
-/routing bgp instance
-set default as=65002
-/ip address
-add address=198.18.0.10/30 interface=ether1 network=198.18.0.8
-add address=192.0.2.3/24 interface=ether2 network=192.0.2.0
-/ip dns
-set servers=1.1.1.1,8.8.8.8
-/ip route
-add check-gateway=arp distance=21 gateway=198.18.0.9
-add distance=1 dst-address=198.18.132.0/22 type=blackhole
-/ipv6 address
-add address=2002:c:c:2::2 advertise=no interface=ether1
-add address=2002:cafe::3 advertise=no interface=ether2
-/ipv6 route
-add distance=21 gateway=2002:c:c:2::1
-add distance=250 dst-address=2002:f002::/32 type=unreachable
-/routing bgp network
-add network=198.18.132.0/22
-add network=2002:f002::/32
-/routing bgp peer
-add name=TRANSIT1v4 remote-address=198.18.0.9 remote-as=65005
-add address-families=ipv6 name=TRANSIT1v6 remote-address=2002:c:c:2::1 remote-as=65005
-add name=TRANSIT1v4-IXP remote-address=192.0.2.1 remote-as=65005
-add address-families=ipv6 name=TRANSIT1v6-IXP remote-address=2002:cafe::1 remote-as=65005
-/system identity
-set name=C2-AS65002
+/interface bridge add name=Lo0
+/interface ethernet set [ find default-name=ether1 ] comment="Link hacia IPTRANSIT1 Gi0/0/0/3 [AS65005]"
+/interface ethernet set [ find default-name=ether2 ] comment="Link hacia IXP [AS65000]"
+/routing bgp instance set default as=65002
+/ip address add address=198.18.0.10/30 interface=ether1 network=198.18.0.8
+/ip address add address=192.0.2.3/24 interface=ether2 network=192.0.2.0
+/ip address add address=198.18.132.132 interface=Lo0 network=198.18.132.132
+/ip dns set servers=1.1.1.1,8.8.8.8
+/ip route add check-gateway=arp distance=21 gateway=198.18.0.9
+/ip route add distance=250 dst-address=198.18.132.0/22 type=blackhole
+/ipv6 address add address=2002:c:c:2::2 advertise=no interface=ether1
+/ipv6 address add address=2002:cafe::3 advertise=no interface=ether2
+/ipv6 address add address=2002:f002::cafe/128 advertise=no interface=Lo0
+/ipv6 route add distance=21 gateway=2002:c:c:2::1
+/ipv6 route add distance=250 dst-address=2002:f002::/32 type=unreachable
+/routing bgp network add network=198.18.132.0/22
+/routing bgp network add network=2002:f002::/32
+/routing bgp network add disabled=yes network=198.18.132.132/32 synchronize=no
+/routing bgp peer add in-filter=TRANSIT1-IN name=TRANSIT1v4 out-filter=TRANSIT1-OUT remote-address=198.18.0.9 remote-as=65005
+/routing bgp peer add address-families=ipv6 in-filter=TRANSIT1-IN name=TRANSIT1v6 out-filter=TRANSIT1-OUT remote-address=2002:c:c:2::1 remote-as=65005
+/routing bgp peer add in-filter=IXP-IN name=TRANSIT1v4-IXP out-filter=IXP-OUT remote-address=192.0.2.254 remote-as=65000
+/routing bgp peer add address-families=ipv6 in-filter=IXP-IN name=TRANSIT1v6-IXP out-filter=IXP-OUT remote-address=2002:cafe::cafe remote-as=65000
+/routing filter add action=accept chain=BH prefix=198.18.132.132 set-bgp-communities=65005:9999
+/routing filter add action=accept chain=TRANSIT1-IN prefix=0.0.0.0/0 prefix-length=0-24
+/routing filter add action=accept chain=TRANSIT1-IN prefix=2000::/3 prefix-length=3-48
+/routing filter add action=discard chain=TRANSIT1-IN
+/routing filter add action=accept chain=TRANSIT1-OUT prefix=198.18.132.0/22 prefix-length=22-24
+/routing filter add action=accept chain=TRANSIT1-OUT prefix=2002:f002::/32 prefix-length=32-48
+/routing filter add action=accept append-bgp-communities=65005:666 chain=TRANSIT1-OUT prefix=198.18.132.0/22 prefix-length=32
+/routing filter add action=accept append-bgp-communities=65005:666 chain=TRANSIT1-OUT prefix=2002:f002::/32 prefix-length=128
+/routing filter add action=discard chain=TRANSIT1-OUT
+/routing filter add action=accept chain=IXP-IN prefix=0.0.0.0/0 prefix-length=0-24 set-bgp-local-pref=200
+/routing filter add action=accept chain=IXP-IN prefix=2000::/3 prefix-length=3-48 set-bgp-local-pref=200
+/routing filter add action=discard chain=IXP-IN
+/routing filter add action=accept chain=IXP-OUT prefix=198.18.132.0/22 prefix-length=22-24
+/routing filter add action=accept chain=IXP-OUT prefix=2002:f002::/32 prefix-length=32-48
+/routing filter add action=discard chain=IXP-OUT
+/system identity set name=C2-AS65002
