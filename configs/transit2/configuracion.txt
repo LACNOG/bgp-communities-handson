@@ -1,4 +1,5 @@
 set version 18.2R1.9
+set system root-authentication encrypted-password "$6$f9eYTiCc$rhGhuw5.git5GH/JOSLtaBDDXmU2kRafD3yl4zgdOyU8IRDOfqZjLBG9129fo5gam8eZEhQv2PjvQua2IxJ.6/"
 set system syslog user * any emergency
 deactivate system syslog user *
 set system syslog file messages any notice
@@ -21,10 +22,15 @@ set interfaces ge-0/0/3 description BO:C4:AS65004
 set interfaces ge-0/0/3 unit 0 family inet address 198.18.64.9/30
 set interfaces ge-0/0/3 unit 0 family inet6 address 2002:1c:c:4::1/64
 set interfaces fxp0 unit 0 family inet dhcp vendor-id Juniper-vmx-VM602D903376
+set interfaces lo0 unit 0 family inet address 198.18.65.1/32
+set interfaces lo0 unit 0 family inet6 address 2002:10:198:18:64::1/128
+set routing-options rib inet6.0 static route 100::/64 discard
+set routing-options rib inet6.0 static route 2002:10::/28 discard
+set routing-options rib inet6.0 static route 2002:10::/28 community 65006:1
 set routing-options static route 198.18.64.0/18 discard
 set routing-options static route 198.18.64.0/18 community 65006:1
-set routing-options static route 192.0.2.1/32 discard
-set routing-options rib inet6.0 static route 100::/64 discard
+set routing-options static route 200.31.0.1/32 discard
+set routing-options router-id 198.18.65.1
 set routing-options autonomous-system 65006
 set protocols bgp group UY-65007-v4 type external
 set protocols bgp group UY-65007-v4 import CLIENTES_IN
@@ -75,7 +81,9 @@ set protocols bgp group BR-IXP-v4 neighbor 192.0.2.4 description AR:C3:AS65003
 set protocols bgp group BR-IXP-v4 neighbor 192.0.2.4 peer-as 65003
 deactivate protocols bgp group BR-IXP-v4 neighbor 192.0.2.4
 set protocols bgp group BR-IXP-v6 type external
+set protocols bgp group BR-IXP-v6 import IXP_IN
 set protocols bgp group BR-IXP-v6 family inet6 unicast
+set protocols bgp group BR-IXP-v6 export IXP_OUT
 set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::1 description TRANSIT1:AS65005
 set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::1 peer-as 65005
 set protocols bgp group BR-IXP-v6 neighbor 2002:cafe::3 description PY:C2:AS65002
@@ -102,18 +110,9 @@ set policy-options policy-statement CLIENTES_BO_OUT term LOCALES from community 
 set policy-options policy-statement CLIENTES_BO_OUT term LOCALES then accept
 set policy-options policy-statement CLIENTES_BO_OUT term FINAL from protocol bgp
 set policy-options policy-statement CLIENTES_BO_OUT term FINAL then accept
-set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR
-set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR_CLIENTES
-set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR_URUGUAY
-set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community BLACKHOLE
-set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR then reject
-set policy-options policy-statement CLIENTES_UY_OUT term LOCALES from community PROPIOS
-set policy-options policy-statement CLIENTES_UY_OUT term LOCALES then accept
-set policy-options policy-statement CLIENTES_UY_OUT term FINAL from protocol bgp
-set policy-options policy-statement CLIENTES_UY_OUT term FINAL then accept
 set policy-options policy-statement CLIENTES_IN term BLACKHOLE-v4 from community BLACKHOLE
 set policy-options policy-statement CLIENTES_IN term BLACKHOLE-v4 from route-filter 0.0.0.0/0 prefix-length-range /32-/32
-set policy-options policy-statement CLIENTES_IN term BLACKHOLE-v4 then next-hop 192.0.2.1
+set policy-options policy-statement CLIENTES_IN term BLACKHOLE-v4 then next-hop 200.31.0.1
 set policy-options policy-statement CLIENTES_IN term BLACKHOLE-v6 from community BLACKHOLE
 set policy-options policy-statement CLIENTES_IN term BLACKHOLE-v6 from route-filter ::/0 prefix-length-range /128-/128
 set policy-options policy-statement CLIENTES_IN term BLACKHOLE-v6 then next-hop 100::1
@@ -127,6 +126,15 @@ set policy-options policy-statement CLIENTES_IN term PREPENDX2 from community PR
 set policy-options policy-statement CLIENTES_IN term PREPENDX2 then as-path-prepend "65006 65006"
 set policy-options policy-statement CLIENTES_IN term FINAL then community add CLIENTES
 set policy-options policy-statement CLIENTES_IN term FINAL then accept
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR_CLIENTES
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community NO_PROPAGAR_URUGUAY
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR from community BLACKHOLE
+set policy-options policy-statement CLIENTES_UY_OUT term NO_PROPAGAR then reject
+set policy-options policy-statement CLIENTES_UY_OUT term LOCALES from community PROPIOS
+set policy-options policy-statement CLIENTES_UY_OUT term LOCALES then accept
+set policy-options policy-statement CLIENTES_UY_OUT term FINAL from protocol bgp
+set policy-options policy-statement CLIENTES_UY_OUT term FINAL then accept
 set policy-options policy-statement IXP_IN term FINAL then community set PEERS
 set policy-options policy-statement IXP_IN term FINAL then accept
 set policy-options policy-statement IXP_OUT term NO_PROPAGAR from community NO_PROPAGAR
