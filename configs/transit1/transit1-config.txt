@@ -1,7 +1,14 @@
 !! IOS XR Configuration 5.2.0
-!! Last configuration change at Sun Mar  7 23:34:54 2021 by a
+!! Last configuration change at Mon Mar  8 04:12:12 2021 by a
 !
 hostname IPTRANSIT1
+domain name-server 172.20.64.64
+interface Loopback0
+ description Para hacer pruebas
+ ipv4 address 198.18.6.66 255.255.255.255
+ ipv6 address 2002:a:a:a:a:a:a:a/128
+ ipv6 enable
+!
 interface MgmtEth0/0/CPU0/0
  shutdown
 !
@@ -139,6 +146,11 @@ route-policy IXP-IN
   if destination in ALLOWED-PREFIXES then
     set community (65005:5552)
     set community (65005:5554) additive
+    if next-hop in (192.0.2.2, 2002:cafe::2) then
+      set local-preference 75
+    else
+      set local-preference 105
+    endif
   endif
 end-policy
 !
@@ -305,16 +317,6 @@ router bgp 65005
   use neighbor-group IXPv4
   description Customer TRANSIT2 AS65006 IPv4
  !
- neighbor 192.0.2.3
-  remote-as 65002
-  use neighbor-group IXPv4
-  description Customer C2 AS65002 IPv4
- !
- neighbor 192.0.2.4
-  remote-as 65003
-  use neighbor-group IXPv4
-  description Customer C3 AS65003 IPv4
- !
  neighbor 198.18.0.2
   remote-as 65007
   use neighbor-group CUSTOMERSv4
@@ -329,6 +331,11 @@ router bgp 65005
   remote-as 65007
   use neighbor-group CUSTOMERSv4
   description Customer R2 AS65007 IPv4 Peer1
+ !
+ neighbor 192.0.2.254
+  remote-as 65000
+  use neighbor-group IXPv4
+  description IXP RS AS65000 IPv4
  !
  neighbor 198.18.0.10
   remote-as 65002
@@ -347,16 +354,6 @@ router bgp 65005
   use neighbor-group IXPv6
   description Customer TRANSIT2 AS65006 IPv6
  !
- neighbor 2002:cafe::3
-  remote-as 65002
-  use neighbor-group IXPv6
-  description Customer C2 AS65002 IPv6
- !
- neighbor 2002:cafe::4
-  remote-as 65003
-  use neighbor-group IXPv6
-  description Customer C3 AS65003 IPv6
- !
  neighbor 2002:c:c:1::2
   remote-as 65001
   use neighbor-group CUSTOMERSv6
@@ -371,6 +368,11 @@ router bgp 65005
   remote-as 65007
   use neighbor-group CUSTOMERSv6
   description Customer R2 AS65007 IPv6 Peer2
+ !
+ neighbor 2002:cafe::cafe
+  remote-as 65000
+  use neighbor-group IXPv6
+  description IXP-RS AS65000 IPv6
  !
 !
 end
