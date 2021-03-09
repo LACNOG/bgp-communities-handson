@@ -126,19 +126,20 @@ router bgp 65007
 ip forward-protocol nd
 !
 ip bgp-community new-format
-ip community-list standard AdvertiseNoAction_Transit2L1 permit 65000:10000
+ip community-list standard AdvertiseNoAction_AllPeers permit 65000:10000
 !
 no ip http server
 no ip http secure-server
-!
+ip route 10.0.0.1 255.255.255.255 Null0
 !         
+!
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 route-map NADA permit 10
  match ip address prefix-list DENY-ALL
 !
 route-map Transit2L1_out permit 10
- match community AdvertiseNoAction_Transit2L1
+ match community AdvertiseNoAction_AllPeers
 !
 !
 !

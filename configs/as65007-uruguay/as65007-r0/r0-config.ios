@@ -100,8 +100,6 @@ interface Ethernet1/3
 !
 router isis 65007
  net 49.0001.1980.1814.7001.00
- passive-interface Ethernet0/2
- passive-interface Ethernet0/3
  passive-interface Ethernet1/1
  passive-interface Loopback0
 !
@@ -123,7 +121,10 @@ router bgp 65007
  neighbor 198.18.144.22 description R0 <--> Rx
  !
  address-family ipv4
+  network 198.18.145.0 mask 255.255.255.252
+  network 198.18.145.4 mask 255.255.255.252
   neighbor 198.18.144.2 activate
+  neighbor 198.18.144.2 send-community both
   neighbor 198.18.144.2 route-reflector-client
   neighbor 198.18.144.2 soft-reconfiguration inbound
   neighbor 198.18.144.10 activate
@@ -153,8 +154,8 @@ ip bgp-community new-format
 !
 no ip http server
 no ip http secure-server
-!
 !         
+!
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 route-map NADA permit 10
@@ -177,6 +178,6 @@ line aux 0
 line vty 0 4
  login
  transport input all
-!         
+!
 !
 end
