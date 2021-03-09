@@ -7,15 +7,15 @@
 
 ----------------------------------------------------------------
 
-**65xxx:yyyyy**
+### **65xxx:yyyyy**
 
-xxx: set an action
+**xxx**: set an action
 
-yyyyy: indicates a specific link
+**yyyyy**: indicates a specific link
 
 ----------------------------------------------------------------
 
-\[65**XYZ**:yyyyy]:
+### \[65**XYZ**:yyyyy]:
 
 XYZ=000: no action
 
@@ -35,7 +35,7 @@ XYZ=302: advertise to regional customers only
 
 ----------------------------------------------------------------
 
-\[65xxx:**A**yyyy]: kind of peer
+### \[65xxx:**A**yyyy]: kind of peer
 
 A=1: advertise to all peers
 
@@ -45,7 +45,7 @@ A=3: advertise to peering peers
 
 
 
-\[65xxx:y**B**yyy]: peer location
+### \[65xxx:y**B**yyy]: peer location
 
 B=0: no more specific link
 
@@ -63,7 +63,7 @@ B=6: BO
 
 
 
-\[65xxx:yy**CC**y]: provider id
+### \[65xxx:yy**CC**y]: provider id
 
 CC=00: no more specific link
 
@@ -75,7 +75,7 @@ CC=03: IXP (AS65000)
 
 
 
-\[65xxx:yyyy**D**]: link id (when multiple links with same provider)
+### \[65xxx:yyyy**D**]: link id (when multiple links with same provider)
 
 D=0: no more specific link
 
