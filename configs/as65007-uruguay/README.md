@@ -29,7 +29,9 @@ XYZ=003: add 3 prepend
 
 XYZ=005: add 5 prepend
 
-XYZ=100: no advertise
+XYZ=100: **no-export** -- *Do not export to next AS (well-known community)*
+
+XYZ=110: **no-advertise** -- *Do not advertise to any peer (well-known community)*
 
 XYZ=111: blackhole
 

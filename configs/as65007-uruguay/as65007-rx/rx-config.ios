@@ -16,8 +16,8 @@ no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
 !
-!
 !         
+!
 !
 !
 !
@@ -39,8 +39,8 @@ multilink bundle-name authenticated
 redundancy
 !
 !
-! 
 !         
+!
 !
 !
 !
@@ -63,7 +63,7 @@ interface Ethernet0/0
 !
 interface Ethernet0/1
  no ip address
- shutdown 
+ shutdown
 !
 interface Ethernet0/2
  no ip address
@@ -105,21 +105,30 @@ router bgp 65007
  address-family ipv4
   network 198.18.144.0 mask 255.255.252.0 route-map B198-18-144-0--22
   network 198.20.0.0 mask 255.255.0.0 route-map B198-20-0-0--16
-  network 198.20.10.0 route-map B198-20-10-0--24
-  network 198.20.20.0 route-map B198-20-20-0--24
-  network 198.20.30.0 route-map B198-20-30-0--24
+  network 198.20.0.0 mask 255.255.248.0 route-map B198-20-0-0--21
+  network 198.20.0.0 route-map B198-20-0-0--24
+  network 198.20.1.0 route-map B198-20-1-0--24
+  network 198.20.8.0 mask 255.255.248.0 route-map B198-20-8-0--21
+  network 198.20.8.0 route-map B198-20-8-0--24
+  network 198.20.9.0 route-map B198-20-9-0--24
+  network 198.20.16.0 mask 255.255.248.0 route-map B198-20-16-0--21
+  network 198.20.16.0 route-map B198-20-16-0--24
+  network 198.20.17.0 route-map B198-20-17-0--24
+  network 198.20.24.0 mask 255.255.248.0 route-map B198-20-24-0--21
+  network 198.20.24.0 route-map B198-20-24-0--24
+  network 198.20.25.0 route-map B198-20-25-0--24
+  network 198.20.32.0 mask 255.255.248.0 route-map B198-20-32-0--21
+  network 198.20.32.0 route-map B198-20-32-0--24
+  network 198.20.33.0 route-map B198-20-33-0--24
+  network 198.20.40.0 mask 255.255.248.0 route-map B198-20-40-0--21
   network 198.20.40.0 route-map B198-20-40-0--24
-  network 198.20.50.0 route-map B198-20-50-0--24
-  network 198.20.60.0 route-map B198-20-60-0--24
-  network 198.20.70.0 route-map B198-20-70-0--24
-  network 198.20.80.0 route-map B198-20-80-0--24
-  network 198.20.90.0 route-map B198-20-90-0--24
-  network 198.20.100.0 route-map B198-20-100-0--24
-  network 198.20.110.0 route-map B198-20-120-0--24
-  network 198.20.120.0 route-map B198-20-120-0--24
-  network 198.20.130.0 route-map B198-20-130-0--24
-  network 198.20.140.0 route-map B198-20-140-0--24
-  network 198.20.150.0 route-map B198-20-150-0--24
+  network 198.20.41.0 route-map B198-20-41-0--24
+  network 198.20.48.0 mask 255.255.248.0 route-map B198-20-48-0--21
+  network 198.20.48.0 route-map B198-20-48-0--24
+  network 198.20.49.0 route-map B198-20-49-0--24
+  network 198.20.56.0 mask 255.255.248.0 route-map B198-20-56-0--21
+  network 198.20.56.0 route-map B198-20-56-0--24
+  network 198.20.57.0 route-map B198-20-57-0--24
   neighbor 198.18.144.21 activate
   neighbor 198.18.144.21 send-community both
   neighbor 198.18.144.21 soft-reconfiguration inbound
@@ -141,27 +150,54 @@ no ip http secure-server
 ip route 10.0.0.1 255.255.255.255 Null0
 ip route 198.18.144.0 255.255.252.0 Null0
 ip route 198.20.0.0 255.255.0.0 Null0
-ip route 198.20.10.0 255.255.255.0 Null0
-ip route 198.20.20.0 255.255.255.0 Null0
-ip route 198.20.30.0 255.255.255.0 Null0
+ip route 198.20.0.0 255.255.248.0 Null0
+ip route 198.20.0.0 255.255.255.0 Null0
+ip route 198.20.1.0 255.255.255.0 Null0
+ip route 198.20.8.0 255.255.248.0 Null0
+ip route 198.20.8.0 255.255.255.0 Null0
+ip route 198.20.9.0 255.255.255.0 Null0
+ip route 198.20.16.0 255.255.248.0 Null0
+ip route 198.20.16.0 255.255.255.0 Null0
+ip route 198.20.17.0 255.255.255.0 Null0
+ip route 198.20.24.0 255.255.248.0 Null0
+ip route 198.20.24.0 255.255.255.0 Null0
+ip route 198.20.25.0 255.255.255.0 Null0
+ip route 198.20.32.0 255.255.248.0 Null0
+ip route 198.20.32.0 255.255.255.0 Null0
+ip route 198.20.33.0 255.255.255.0 Null0
+ip route 198.20.40.0 255.255.248.0 Null0
 ip route 198.20.40.0 255.255.255.0 Null0
-ip route 198.20.50.0 255.255.255.0 Null0
-ip route 198.20.60.0 255.255.255.0 Null0
-ip route 198.20.70.0 255.255.255.0 Null0
-ip route 198.20.80.0 255.255.255.0 Null0
-ip route 198.20.90.0 255.255.255.0 Null0
-ip route 198.20.100.0 255.255.255.0 Null0
-ip route 198.20.110.0 255.255.255.0 Null0
-ip route 198.20.120.0 255.255.255.0 Null0
-ip route 198.20.130.0 255.255.255.0 Null0
-ip route 198.20.140.0 255.255.255.0 Null0
-ip route 198.20.150.0 255.255.255.0 Null0
+ip route 198.20.41.0 255.255.255.0 Null0
+ip route 198.20.48.0 255.255.248.0 Null0
+ip route 198.20.48.0 255.255.255.0 Null0
+ip route 198.20.49.0 255.255.255.0 Null0
+ip route 198.20.56.0 255.255.248.0 Null0
+ip route 198.20.56.0 255.255.255.0 Null0
+ip route 198.20.57.0 255.255.255.0 Null0
 !
 !
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
-!
+!         
 route-map NADA permit 10
  match ip address prefix-list DENY-ALL
+!
+route-map B198-20-9-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10011 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-8-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10011 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-8-0--21 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10010 65000:30000
+ set ip next-hop 10.0.0.1
 !
 route-map B198-18-144-0--22 permit 10
  set local-preference 100
@@ -169,90 +205,140 @@ route-map B198-18-144-0--22 permit 10
  set community 65000:10000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-120-0--24 permit 10
- set local-preference 100
- set origin igp
- set ip next-hop 10.0.0.1
-!
-route-map B198-20-130-0--24 permit 10
- set local-preference 100
- set origin igp
- set ip next-hop 10.0.0.1
-!         
 route-map B198-20-0-0--16 permit 10
  set local-preference 100
  set origin igp
  set community 65000:10000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-100-0--24 permit 10
+route-map B198-20-1-0--24 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10011 65100:10000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-110-0--24 permit 10
+route-map B198-20-0-0--24 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10011 65100:10000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-140-0--24 permit 10
+route-map B198-20-0-0--21 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10010 65000:30000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-150-0--24 permit 10
+route-map B198-20-48-0--21 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10020 65000:30000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-90-0--24 permit 10
+route-map B198-20-49-0--24 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10020 65100:10000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-80-0--24 permit 10
+route-map B198-20-48-0--24 permit 10
  set local-preference 100
  set origin igp
- set ip next-hop 10.0.0.1
-!
-route-map B198-20-30-0--24 permit 10
- set local-preference 100
- set origin igp
- set ip next-hop 10.0.0.1
-!
-route-map B198-20-20-0--24 permit 10
- set local-preference 100
- set origin igp
+ set community 65000:10020 65100:10000
  set ip next-hop 10.0.0.1
 !         
-route-map B198-20-10-0--24 permit 10
+route-map B198-20-24-0--21 permit 10
  set local-preference 100
  set origin igp
- set community 65000:10000
+ set community 65000:10010 65000:30000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-70-0--24 permit 10
+route-map B198-20-56-0--24 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10020 65100:10000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-60-0--24 permit 10
+route-map B198-20-16-0--21 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10010 65000:30000
  set ip next-hop 10.0.0.1
 !
-route-map B198-20-50-0--24 permit 10
+route-map B198-20-57-0--24 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10020 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-40-0--21 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10010 65000:30000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-32-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10012 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-33-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10012 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-16-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10011 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-25-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10012 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-56-0--21 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10020 65000:30000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-17-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10011 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-24-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10012 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-41-0--24 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10012 65100:10000
+ set ip next-hop 10.0.0.1
+!
+route-map B198-20-32-0--21 permit 10
+ set local-preference 100
+ set origin igp
+ set community 65000:10010 65000:30000
  set ip next-hop 10.0.0.1
 !
 route-map B198-20-40-0--24 permit 10
  set local-preference 100
  set origin igp
+ set community 65000:10012 65100:10000
  set ip next-hop 10.0.0.1
 !
 !
-!
+!         
 control-plane
 !
 !
@@ -270,4 +356,4 @@ line vty 0 4
  transport input all
 !
 !
-end       
+end
