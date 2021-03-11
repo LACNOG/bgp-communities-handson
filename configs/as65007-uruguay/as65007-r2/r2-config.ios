@@ -15,9 +15,9 @@ no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
 ip source-route
+!
+!
 !         
-!
-!
 !
 ip cef
 no ip domain lookup
@@ -38,9 +38,9 @@ multilink bundle-name authenticated
 redundancy
 ! 
 !
+!
+!
 !         
-!
-!
 !
 !
 !
@@ -63,7 +63,7 @@ interface Ethernet0/1.497
  encapsulation dot1Q 497
  ip address 192.0.2.66 255.255.255.0
  ipv6 address 2002:CAFE::666/64
-!
+!         
 interface Ethernet0/2
  description R2 <--> R0
  ip address 198.18.144.2 255.255.255.252
@@ -86,7 +86,7 @@ interface Ethernet1/1
 interface Ethernet1/2
  no ip address
  shutdown
-!
+!         
 interface Ethernet1/3
  no ip address
  shutdown
@@ -155,7 +155,7 @@ ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 route-map NADA permit 10
  match ip address prefix-list DENY-ALL
-!
+!         
 route-map Transit1L2_out permit 10
  match community AdvertiseNoAction_AllPeers
 !
@@ -176,4 +176,4 @@ line vty 0 4
  transport input all
 !
 exception data-corruption buffer truncate
-end       
+end

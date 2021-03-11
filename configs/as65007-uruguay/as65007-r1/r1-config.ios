@@ -16,8 +16,8 @@ no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
 !
-!         
 !
+!         
 !
 !
 !
@@ -39,8 +39,8 @@ multilink bundle-name authenticated
 redundancy
 !
 !
+! 
 !         
-!
 !
 !
 !
@@ -85,7 +85,7 @@ interface Ethernet1/1
 interface Ethernet1/2
  no ip address
  shutdown
-!         
+!
 interface Ethernet1/3
  no ip address
  shutdown
@@ -131,8 +131,8 @@ ip community-list standard AdvertiseNoAction_AllPeers permit 65000:10000
 no ip http server
 no ip http secure-server
 ip route 10.0.0.1 255.255.255.255 Null0
-!         
 !
+!         
 ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 route-map NADA permit 10
