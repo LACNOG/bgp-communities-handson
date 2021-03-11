@@ -15,9 +15,9 @@ no mmi auto-configure
 no mmi pvc
 mmi snmp-timeout 180
 ip source-route
-!
-!
 !         
+!
+!
 !
 ip cef
 no ip domain lookup
@@ -38,9 +38,9 @@ multilink bundle-name authenticated
 redundancy
 ! 
 !
-!
-!
 !         
+!
+!
 !
 !
 !
@@ -63,7 +63,7 @@ interface Ethernet0/1.497
  encapsulation dot1Q 497
  ip address 192.0.2.66 255.255.255.0
  ipv6 address 2002:CAFE::666/64
-!         
+!
 interface Ethernet0/2
  description R2 <--> R0
  ip address 198.18.144.2 255.255.255.252
@@ -86,7 +86,7 @@ interface Ethernet1/1
 interface Ethernet1/2
  no ip address
  shutdown
-!         
+!
 interface Ethernet1/3
  no ip address
  shutdown
@@ -142,6 +142,9 @@ ip forward-protocol nd
 !
 ip bgp-community new-format
 ip community-list standard AdvertiseNoAction_AllPeers permit 65000:10000
+ip community-list expanded AdvertiseNoAction_TRANSIT1 permit 65000:[1|2][0-9]010
+ip community-list expanded AdvertiseNoAction_TRANSIT1L1 permit 65000:[1|2][0-9]011
+ip community-list expanded AdvertiseNoAction_TRANSIT1L2 permit 65000:[1|2][0-9]012
 !
 no ip http server
 no ip http secure-server
@@ -155,12 +158,24 @@ ip prefix-list DENY-ALL seq 5 deny 0.0.0.0/0
 !
 route-map NADA permit 10
  match ip address prefix-list DENY-ALL
-!         
+!
 route-map Transit1L2_out permit 10
  match community AdvertiseNoAction_AllPeers
 !
+route-map Transit1L2_out permit 20
+ match community AdvertiseNoAction_TRANSIT1
+!
+route-map Transit1L2_out permit 30
+ match community AdvertiseNoAction_TRANSIT1L2
+!
 route-map Transit1L1_out permit 10
  match community AdvertiseNoAction_AllPeers
+!
+route-map Transit1L1_out permit 20
+ match community AdvertiseNoAction_TRANSIT1
+!
+route-map Transit1L1_out permit 30
+ match community AdvertiseNoAction_TRANSIT1L1
 !
 !
 !
