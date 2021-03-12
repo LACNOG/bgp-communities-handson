@@ -127,7 +127,7 @@ ip forward-protocol nd
 !
 ip bgp-community new-format
 ip community-list standard AdvertiseNoAction_AllPeers permit 65000:10000
-ip community-list expanded AdvertiseNoAction_TRANSIT2 permit 65000:[1|2][0-9]02[0-9]
+ip community-list expanded AdvertiseNoAction_TRANSIT2 permit 65000:[1|2][0-9]020
 !
 no ip http server
 no ip http secure-server
@@ -153,8 +153,8 @@ control-plane
 !
 !
 !
-!         
 !
+!         
 line con 0
  exec-timeout 60 0
  logging synchronous

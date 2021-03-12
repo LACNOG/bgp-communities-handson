@@ -21,29 +21,29 @@
 
 ----------------------------------------------------------------
 
-### \[65**XYZ**:yyyyy]:
+### \[65**XYZ**:yyyyy]: ACTIONS (XYZ)
 
 XYZ=000: no action
 
-XYZ=003: add 3 prepend
+XYZ=003: add 3 prepend -- should always indicate a ***provider_id***
 
-XYZ=005: add 5 prepend
+XYZ=005: add 5 prepend -- should always indicate a ***provider_id***
 
 XYZ=100: **no-export** -- *Do not export to next AS (well-known community)*
 
 XYZ=110: **no-advertise** -- *Do not advertise to any peer (well-known community)*
 
-XYZ=111: blackhole
+XYZ=111: blackhole -- all peers ***65111:10000*** or indicate a ***provider_id***
 
-XYZ=200: change MED
+XYZ=200: change MED -- should always indicate a ***provider_id*** and ***link_id*** (1..9)
 
-XYZ=301: advertise to customers only
+XYZ=301: advertise to customers only -- all peers ***65301:10000*** or indicate a ***provider_id***
 
-XYZ=302: advertise to regional customers only
+XYZ=302: advertise to regional customers only -- all peers ***65302:10000*** or indicate a ***provider_id***
 
 ----------------------------------------------------------------
 
-### \[65xxx:**A**yyyy]: kind of peer
+### \[65xxx:**A**yyyy]: kind_of_peer
 
 A=1: advertise to all peers
 
@@ -53,7 +53,7 @@ A=3: advertise to peering peers
 
 
 
-### \[65xxx:y**B**yyy]: peer location
+### \[65xxx:y**B**yyy]: peer_location
 
 B=0: no more specific link
 
@@ -71,7 +71,7 @@ B=6: BO
 
 
 
-### \[65xxx:yy**CC**y]: provider id
+### \[65xxx:yy**CC**y]: provider_id
 
 CC=00: no more specific link
 
@@ -83,7 +83,7 @@ CC=03: IXP (AS65000)
 
 
 
-### \[65xxx:yyyy**D**]: link id (when multiple links with same provider)
+### \[65xxx:yyyy**D**]: link_id (when multiple links with same provider)
 
 D=0: no more specific link
 
