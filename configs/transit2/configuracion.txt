@@ -167,7 +167,6 @@ set policy-options policy-statement IXP_OUT term LOCALES from community PROPIOS
 set policy-options policy-statement IXP_OUT term LOCALES from community CLIENTES
 set policy-options policy-statement IXP_OUT term LOCALES then accept
 set policy-options policy-statement IXP_OUT term FINAL then reject
-set policy-options community BLACKHOLE members 65006:999
 set policy-options community BLACKHOLE members 65006:666
 set policy-options community CLIENTES members 65006:2
 set policy-options community LOCAL_PREF_MAYOR members 65006:110

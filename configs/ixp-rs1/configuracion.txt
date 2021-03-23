@@ -1,0 +1,177 @@
+frr version 7.5.1
+frr defaults traditional
+hostname FRR-IXP-RS
+log syslog informational
+service integrated-vtysh-config
+!
+!
+interface ens3
+ description Enlace a Switch IXP
+!
+interface ens4
+ description Enlace a TRANSIT1 G0/0/0/7
+!
+interface ens5
+ description Enlace a TRANSIT2 ge-0/0/5
+!
+router bgp 65000
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor RS_CLIENT-v4 peer-group
+ neighbor RS_CLIENT-v6 peer-group
+ neighbor 192.0.2.1 remote-as 65005
+ neighbor 192.0.2.1 peer-group RS_CLIENT-v4
+ neighbor 192.0.2.2 remote-as 65006
+ neighbor 192.0.2.2 peer-group RS_CLIENT-v4
+ neighbor 192.0.2.3 remote-as 65002
+ neighbor 192.0.2.3 peer-group RS_CLIENT-v4
+ neighbor 192.0.2.4 remote-as 65003
+ neighbor 192.0.2.4 peer-group RS_CLIENT-v4
+ neighbor 2002:cafe::1 remote-as 65005
+ neighbor 2002:cafe::1 peer-group RS_CLIENT-v6
+ neighbor 2002:cafe::2 remote-as 65006
+ neighbor 2002:cafe::2 peer-group RS_CLIENT-v6
+ neighbor 2002:cafe::3 remote-as 65002
+ neighbor 2002:cafe::3 peer-group RS_CLIENT-v6
+ neighbor 2002:cafe::4 remote-as 65003
+ neighbor 2002:cafe::4 peer-group RS_CLIENT-v6
+ !
+ address-family ipv4 unicast
+  neighbor RS_CLIENT-v4 activate
+  neighbor RS_CLIENT-v4 route-server-client
+  neighbor RS_CLIENT-v4 attribute-unchanged next-hop
+  neighbor 192.0.2.1 route-map AS65005-in in
+  neighbor 192.0.2.1 route-map AS65005-out out
+  neighbor 192.0.2.2 route-map AS65006-in in
+  neighbor 192.0.2.2 route-map AS65006-out out
+  neighbor 192.0.2.3 route-map AS65002-in in
+  neighbor 192.0.2.3 route-map AS65002-out out
+  neighbor 192.0.2.4 route-map AS65003-in in
+  neighbor 192.0.2.4 route-map AS65003-out out
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  neighbor RS_CLIENT-v6 activate
+  neighbor RS_CLIENT-v6 route-server-client
+  neighbor RS_CLIENT-v6 attribute-unchanged next-hop
+  neighbor 2002:cafe::1 route-map AS65005-in in
+  neighbor 2002:cafe::1 route-map AS65005-out out
+  neighbor 2002:cafe::2 route-map AS65006-in in
+  neighbor 2002:cafe::2 route-map AS65006-out out
+  neighbor 2002:cafe::3 route-map AS65002-in in
+  neighbor 2002:cafe::3 route-map AS65002-out out
+  neighbor 2002:cafe::4 route-map AS65003-in in
+  neighbor 2002:cafe::4 route-map AS65003-out out
+ exit-address-family
+!
+bgp community-list standard NP_AS65001 seq 5 permit 0:65001
+bgp community-list standard NP_AS65002 seq 5 permit 0:65002
+bgp community-list standard NP_AS65003 seq 5 permit 0:65003
+bgp community-list standard NP_AS65004 seq 5 permit 0:65004
+bgp community-list standard NP_AS65005 seq 5 permit 0:65005
+bgp community-list standard NP_AS65006 seq 5 permit 0:65006
+bgp community-list standard NP_AS65007 seq 5 permit 0:65007
+bgp community-list standard NP_NADIE seq 5 permit 0:65000
+bgp community-list standard SP_AS65001 seq 5 permit 65000:65001
+bgp community-list standard SP_AS65002 seq 5 permit 65000:65002
+bgp community-list standard SP_AS65003 seq 5 permit 65000:65003
+bgp community-list standard SP_AS65004 seq 5 permit 65000:65004
+bgp community-list standard SP_AS65005 seq 5 permit 65000:65005
+bgp community-list standard SP_AS65006 seq 5 permit 65000:65006
+bgp community-list standard SP_AS65007 seq 5 permit 65000:65007
+bgp community-list standard SP_TODOS seq 5 permit 65000:65000
+!
+route-map AS65002-in permit 1000
+!
+route-map AS65002-out deny 100
+ match community NP_AS65002
+!
+route-map AS65002-out permit 200
+ match community SP_AS65002
+!
+route-map AS65002-out deny 300
+ match community NP_NADIE
+!
+route-map AS65002-out permit 1000
+!
+route-map AS65004-in permit 1000
+!
+route-map AS65004-out deny 100
+ match community NP_AS65004
+!
+route-map AS65004-out permit 200
+ match community SP_AS65004
+!
+route-map AS65004-out deny 300
+ match community NP_NADIE
+!
+route-map AS65004-out permit 1000
+!
+route-map AS65001-in permit 1000
+!
+route-map AS65001-out deny 100
+ match community NP_AS65001
+!
+route-map AS65001-out permit 200
+ match community SP_AS65001
+!
+route-map AS65001-out deny 300
+ match community NP_NADIE
+!
+route-map AS65001-out permit 1000
+!
+route-map AS65003-in permit 1000
+!
+route-map AS65003-out deny 100
+ match community NP_AS65003
+!
+route-map AS65003-out permit 200
+ match community SP_AS65003
+!
+route-map AS65003-out deny 300
+ match community NP_NADIE
+!
+route-map AS65003-out permit 1000
+!
+route-map AS65007-in permit 1000
+!
+route-map AS65007-out deny 100
+ match community NP_AS65007
+!
+route-map AS65007-out permit 200
+ match community SP_AS65007
+!
+route-map AS65007-out deny 300
+ match community NP_NADIE
+!
+route-map AS65007-out permit 1000
+!
+route-map AS65005-in permit 1000
+!
+route-map AS65005-out deny 100
+ match community NP_AS65005
+!
+route-map AS65005-out permit 200
+ match community SP_AS65005
+!
+route-map AS65005-out deny 300
+ match community NP_NADIE
+!
+route-map AS65005-out permit 1000
+!
+route-map AS65006-in permit 1000
+!
+route-map AS65006-out deny 100
+ match community NP_AS65006
+!
+route-map AS65006-out permit 200
+ match community SP_AS65006
+!
+route-map AS65006-out deny 300
+ match community NP_NADIE
+!
+route-map AS65006-out permit 1000
+!
+line vty
+!
+end
