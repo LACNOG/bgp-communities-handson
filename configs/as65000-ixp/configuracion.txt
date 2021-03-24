@@ -5,14 +5,12 @@ log syslog informational
 service integrated-vtysh-config
 !
 !
-interface ens3
+interface eth0
  description Enlace a Switch IXP
+ ip address 192.0.2.254/24
+ ipv6 address 2002:cafe::cafe/64
+ no shutdown
 !
-interface ens4
- description Enlace a TRANSIT1 G0/0/0/7
-!
-interface ens5
- description Enlace a TRANSIT2 ge-0/0/5
 !
 router bgp 65000
  bgp log-neighbor-changes
